@@ -9,3 +9,8 @@ selenium
 python-dotenv
 thread6
 nltk
+passlib
+SQLAlchemy
+Werkzeug
+gunicorn
+gevent
