@@ -7,4 +7,4 @@ dnspython
 textblob
 selenium
 python-dotenv
-threading
+thread6
