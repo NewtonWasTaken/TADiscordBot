@@ -2,6 +2,7 @@ import discord
 import os
 import random
 from discord.ext import commands
+from keep_alive import keep_alive
 from kahoot import client
 import json
 import time
@@ -899,6 +900,7 @@ def unescape(s):
     return s
 
 
+keep_alive()
 
 client.run(os.getenv('TOKEN'))
 
