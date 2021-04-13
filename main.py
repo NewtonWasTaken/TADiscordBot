@@ -1,6 +1,7 @@
 import discord
 import os
 import random
+from keep_alive import keep_alive
 from discord.ext import commands
 from kahoot import client
 import json
@@ -897,6 +898,7 @@ def unescape(s):
     s = s.replace("&amp;", "&")
     return s
 
+keep_alive()
 
 client.run(os.getenv('TOKEN'))
 
