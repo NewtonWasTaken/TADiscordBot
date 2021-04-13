@@ -8,4 +8,4 @@ textblob
 selenium
 python-dotenv
 thread6
-ntlk
+nltk
