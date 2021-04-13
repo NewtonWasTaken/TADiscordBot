@@ -595,7 +595,6 @@ async def buy(ctx, number_buy):
   server = ctx.guild
   await coin_update(user, server)
   stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
-  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
   capacity = await capacity_check(user, server)
   my_capacity = stats['capacity']
   if capacity >= my_capacity:
