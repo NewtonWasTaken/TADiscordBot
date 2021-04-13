@@ -604,7 +604,7 @@ async def buy(ctx, number_buy):
       try_number = stats['money'] - 5000
       if try_number >= 0:
         inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
-        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':knife:': 1}})
+        animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':knife:': 1}})
         await ctx.send('Koupil sis :knife:')
       else:
         await ctx.send('Nemáš dostatek peněz na :knife:')
@@ -612,7 +612,7 @@ async def buy(ctx, number_buy):
       try_number = stats['money'] - 20000
       if try_number >= 0:
         inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
-        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':archery:': 1}})
+        animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':archery:': 1}})
         await ctx.send('Koupil sis :archery:')
       else:
         await ctx.send('Nemáš dostatek peněz na :archery:')
@@ -620,7 +620,7 @@ async def buy(ctx, number_buy):
       try_number = stats['money'] - 50000
       if try_number >= 0:
         inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
-        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':spoon:': 1}})
+        animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':spoon:': 1}})
         await ctx.send('Koupil sis :spoon:')
       else:
         await ctx.send('Nemáš dostatek peněz na :spoon:')
