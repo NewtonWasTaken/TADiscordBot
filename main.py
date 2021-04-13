@@ -26,7 +26,7 @@ mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf
 users = mongo_client['TABOT']['users']
 inventory = mongo_client['TABOT']['inventory']
 animals = mongo_client['TABOT']['animals']
-
+graffe = 'debil'
 
 
 hunt_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', '<:kalda:829322764065701889>']
