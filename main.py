@@ -2,7 +2,6 @@ import discord
 import os
 import random
 from discord.ext import commands
-from keep_alive import keep_alive
 from kahoot import client
 import json
 import time
@@ -10,7 +9,6 @@ import requests
 import asyncio
 from google_trans_new import google_translator
 import pymongo
-from discord.utils import get
 
 
 
@@ -899,8 +897,6 @@ def unescape(s):
     s = s.replace("&amp;", "&")
     return s
 
-
-keep_alive()
 
 client.run(os.getenv('TOKEN'))
 
