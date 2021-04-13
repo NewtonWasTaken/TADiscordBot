@@ -1,4 +1,4 @@
 discord.py
-kahoot
-google_trans_new
-pymongo
+kahoot.py
+google_trans_new.py
+pymongo.py
