@@ -4,3 +4,6 @@ google_trans_new
 pymongo
 flask
 dnspython
+textblob
+selenium
+python-dotenv
