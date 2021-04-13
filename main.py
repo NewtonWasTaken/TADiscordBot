@@ -9,6 +9,8 @@ import time
 import requests
 import asyncio
 from google_trans_new import google_translator
+import pymongo
+from discord.utils import get
 
 
 
@@ -20,11 +22,17 @@ bot = client()
 client = commands.Bot(command_prefix="!")
 client.remove_command('help')
 
+password = os.getenv('PASSWORD')
+mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+users = mongo_client['TABOT']['users']
+inventory = mongo_client['TABOT']['inventory']
+animals = mongo_client['TABOT']['animals']
 
 
-hunt_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:']
-sell_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', ':archery:', ':spoon:']
-price_list = [50, 75, 150, 4000, 200, 500, 250, 200, 600, 5000, 17000, 45000]
+
+hunt_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', '<:kalda:829322764065701889>']
+sell_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', ':archery:', ':spoon:', '<:kalda:829322764065701889>']
+price_list = [50, 75, 150, 4000, 200, 500, 250, 200, 600, 5000, 17000, 45000, 0]
 fail_text = ['Našel jsi :teddy_bear: hodil jsi ho do popelnice...', 'Našel jsi dva dny staré :newspaper2:, jediný co ses dozvěděl je že zase prodloužili lockdown...', 'Našel jsi :knot: Myslím že ti bude k ničemu...','Našel jsi :knife:, ale byl plastovej xd', 'Našel jsi :french_bread:, a snědl jsi ji, takže teď už nemáš nic :)','Našel jsi :bread:, a snědl jsi ho, takže teď už nemáš nic :)', 'Našel jsi :knot:, takže se konečně můžeš oběsit...']
 pp = ['8D', '8=D', '8==D', '8===D', '8====D', '8=====D', '8======D', '8=======D', '8========D']
 
@@ -40,8 +48,6 @@ flaska4 = []
 
 @client.event
 async def on_message(message):
-  with open('users.json', 'r') as f:
-    users = json.load(f)
   if message.content.startswith('p!play https://www.youtube.com/playlist?list=PL3WrFU8w7SuJcMPrz77_yJWbRQGMRvhic'):
     time.sleep(1)
     await message.channel.send('p!disconnect')
@@ -51,59 +57,60 @@ async def on_message(message):
   
 
 
-  await update_data(users, message.author, message.guild)
-  await add_xp(users, message.author, 20, message.guild)
-  await level_up(users, message.author, message.guild)
+  await update_data(message.author, message.guild)
+  await add_xp(message.author, 20, message.guild)
+  await level_up(message.author, message.guild)
   await client.process_commands(message)
-  time.sleep(0.1)
-  with open('users.json', 'w') as f:
-    json.dump(users, f)
+  
 
 
-async def update_data(users, user, server):
-  if not str(user.id) + "-" + str(server.id) in users:
-    users[str(user.id) + "-" + str(server.id)] = {}
-    users[str(user.id) + "-" + str(server.id)]['xp'] = 0
-    users[str(user.id) + "-" + str(server.id)]['level'] = 1
+async def update_data(user, server):
+  stats = users.find_one({'id': str(user.id), 'server': str(server.id)})
+  if stats == None:
+    newuser = {'id': str(user.id), 'server': str(server.id), 'xp': 0, 'level': 1}
+    users.insert_one(newuser)
   
     
     
 
   
 
-async def add_xp(users, user, xp, server):
-   users[str(user.id) + "-" + str(server.id)]['xp'] += xp
+async def add_xp(user, xp, server):
+  stats = users.find_one({'id': str(user.id), 'server': str(server.id)})
+  add = stats['xp'] + xp
+  users.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'xp': add}})
    
    
   
   
    
 
-async def level_up(users, user, server):
+async def level_up(user, server):
+  stats = users.find_one({'id': str(user.id), 'server': str(server.id)})
   if server.id == 693009303526703134:
-   channel = client.get_channel(813814790018826260)
-  elif server.id == 806808047509831700:
+   channel = client.get_channel(826042384558063617)
+  if server.id == 806808047509831700:
     channel = client.get_channel(807246401607827536)
-  exp = users[str(user.id) + "-" + str(server.id)]['xp']
-  lvl_end = users[str(user.id) + "-" + str(server.id)]['level'] + 1
+  exp = stats['xp']
+  lvl_end = stats['level'] + 1
   finish = lvl_end **(1/(1/4))
 
   if exp >= finish:
-    users[str(user.id) + "-" + str(server.id)]['level'] = lvl_end
-    await channel.send('{} má level {}'.format(user.mention, users[str(user.id) + "-" + str(server.id)]['level']))
+    update_level = lvl_end
+    users.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'level': update_level}})
+    await channel.send('{} má level {}'.format(user.mention, lvl_end))
     
 
 
 
 @client.command()
 async def rank(ctx, member: discord.Member = None):
-  with open('users.json', 'r') as f:
-    users = json.load(f)
-
+  
   if member is None:
     member = ctx.message.author
   server = ctx.message.guild 
-  if not str(member.id) + "-" + str(server.id) in users:
+  stats = users.find_one({'id': str(member.id), 'server': str(server.id)})
+  if stats == None:
     embed=discord.Embed(title="Rank", description="Jméno člena: {}".format(member.mention), color=0x084be7)
     embed.add_field(name="XP:", value= '0/16 XP', inline=True)
     embed.add_field(name="Level:", value='1', inline=True)
@@ -111,10 +118,10 @@ async def rank(ctx, member: discord.Member = None):
     embed.set_thumbnail(url = member.avatar_url)
     await ctx.send(embed=embed)
   
-  if str(member.id) + "-" + str(server.id) in users:
-    lvl_end = users[str(member.id) + "-" + str(server.id)]['level'] + 1
-    lvl = users[str(member.id) + "-" + str(server.id)]['level']
-    exp = users[str(member.id) + "-" + str(server.id)]['xp']
+  else:
+    lvl_end = stats['level'] + 1
+    lvl = stats['level']
+    exp = stats['xp']
     
     finish = lvl_end **(1/(1/4))
     finish2 = lvl **(1/(1/4))
@@ -124,12 +131,11 @@ async def rank(ctx, member: discord.Member = None):
     boxes1 = exp2 / boxes
     embed=discord.Embed(title="Rank", description="Jméno člena: {}".format(member.mention), color=0x084be7)
     embed.add_field(name="XP:", value= f'{exp} / {int(finish)} XP', inline=True)
-    embed.add_field(name="Level:", value=users[str(member.id) + "-" + str(server.id)]['level'], inline=True)
+    embed.add_field(name="Level:", value=lvl, inline=True)
     embed.add_field(name=f"{lvl}                                                                {lvl_end}", value=int(boxes1) * ' :blue_square: ' + (10 - int(boxes1)) * ' :white_large_square: ', inline=False)
     embed.set_thumbnail(url = member.avatar_url)
     await ctx.send(embed=embed)
-  with open('users.json', 'w') as f:
-    json.dump(users, f)
+  
   
 
 
@@ -173,7 +179,7 @@ async def end_subcommand(ctx):
     await ctx.send('Flaška byla ukončena!')
 
 
-"""
+
 @client.group(name = 'kahoot', invoke_without_command=True)
 async def kahoot(ctx, arg, arg2):
   bot.join(arg, arg2)
@@ -187,7 +193,7 @@ async def ddos_subcommand(ctx, arg, arg2):
    name = f'{arg2}{i}'
    bot.join(arg, name)
    i = i + 1
-"""
+
 
 @client.group(name='server', invoke_without_command=True)
 async def server(ctx):
@@ -244,13 +250,6 @@ async def meme(ctx):
     await ctx.send(meme['url'])
   else: 
     meme()
-
-
-
-
-
-
-
 
 @client.command()
 async def shrug(ctx):
@@ -357,38 +356,13 @@ async def help_flaska_subcommand(ctx):
 
 @help.command(name='kahoot')
 async def help_kahoot_subcommand(ctx):
-    embed = discord.Embed(
-        title="Help",
-        description=
-        "Pokud potřebuješ s čimkoli pomoct, tady jsou všechny příkazy pro Kahoot:",
-        color=0xff0000)
-    embed.set_author(name="TA Discord Bot")
-    embed.set_thumbnail(
-        url=
-        "https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png"
-    )
-    """
- embed.add_field(name="!kahoot 'heslo' 'jmeno'", value="Připojíš se do kahootu se jmeném které napíšeš!", inline=False)
- """
-    """
- embed.add_field(name="!kahoot ddos 'heslo' 'jmeno'", value="Připojí 100 botů se zadaným jménem do kahootu.", inline=False)
- """
-    embed.add_field(name="!kahoot",
-                    value="Tyto příkazy dočasně nefungují.",
-                    inline=False)
-    embed.set_footer(
-        text=
-        "Pokud chcete o něčem zjistit více napište !help s čím chcete pomoct, například !help flaska."
-    )
-    await ctx.send(embed=embed)
-    embed.add_field(name="!kahoot",
-                    value="Tyto příkazy dočasně nefungují.",
-                    inline=False)
-    embed.set_footer(
-        text=
-        "Pokud chcete o něčem zjistit více napište !help s čím chcete pomoct, například !help flaska."
-    )
-    await ctx.send(embed=embed)
+  embed = discord.Embed(title="Help",description="Pokud potřebuješ s čimkoli pomoct, tady jsou všechny příkazy pro Kahoot:", color=0xff0000)
+  embed.set_author(name="TA Discord Bot")
+  embed.set_thumbnail(url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+  embed.add_field(name="!kahoot 'heslo' 'jmeno'", value="Připojíš se do kahootu se jmeném které napíšeš!", inline=False)
+  embed.add_field(name="!kahoot ddos 'heslo' 'jmeno'", value="Připojí 100 botů se zadaným jménem do kahootu.", inline=False)
+  embed.set_footer(text="Pokud chcete o něčem zjistit více napište !help s čím chcete pomoct, například !help flaska.")
+  await ctx.send(embed=embed)
 
 
 
@@ -513,15 +487,14 @@ async def translate(ctx, *, text):
 
 @client.command()
 async def kviz(ctx, language = None):
- with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
  if language == None:
    language = 'en'
  user = ctx.author
  server = ctx.guild
- await coin_update(inventory, user, server)
- start = await coin_add(inventory, user, server, 'time2', 300)
- pending = 300 - (time.time() - inventory[str(user.id) + '-' + str(server.id)]['time2']) 
+ await coin_update(user, server)
+ stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+ start = await coin_add(user, server, 'time2', 300)
+ pending = 300 - (time.time() - stats['time2']) 
  if start == True:
    if language == 'cz':
       f = requests.get('https://opentdb.com/api.php?amount=1&difficulty=medium&type=multiple')
@@ -552,7 +525,6 @@ async def kviz(ctx, language = None):
         if i == correct:
           number = x
           break
-
         x = x + 1
       def check (m):
        return m.author == ctx.author and m.content.isdigit()
@@ -560,10 +532,10 @@ async def kviz(ctx, language = None):
         msg = await client.wait_for('message', timeout=10.0, check=check)
         if msg.content == str(number):
           await ctx.send('Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>')
-          inventory[str(user.id) + '-' + str(server.id)]['money'] += 100
+          result = stats['money'] + 100
+          inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': result}})          
         else:
           await ctx.send(f'Špatná odpověď, nic jsi nedostal... Správná odpověď byla **{correct}**')
-
       except asyncio.TimeoutError:
         await ctx.send(f'Nestihl jsi odpovědět, nic jsi nedostal... Správná odpověď byla **{correct}**')
    elif language == 'en':
@@ -591,22 +563,19 @@ async def kviz(ctx, language = None):
           break
         x = x + 1
       def check2 (m):
-       return m.author == ctx.author and m.content.isdigit()
-        
+       return m.author == ctx.author and m.content.isdigit()        
       try: 
         msg = await client.wait_for('message', timeout=10.0, check=check2)
         if msg.content == str(number):
           await ctx.send('Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>')
-          inventory[str(user.id) + '-' + str(server.id)]['money'] += 100
+          result = stats['money'] + 100
+          inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': result}})
         else:
           await ctx.send(f'Špatná odpověď, nic jsi nedostal... Správná odpověď byla **{correct}**')
       except asyncio.TimeoutError:
-        await ctx.send(f'Nestihl jsi odpovědět, nic jsi nedostal...Správná odpověď byla **{correct}**')
-      
+        await ctx.send(f'Nestihl jsi odpovědět, nic jsi nedostal...Správná odpověď byla **{correct}**')     
  elif start == False:
    await ctx.send(f'Znova můžeš udělat kvíz za **{int(pending / 60)} minut {int(pending % 60)} sekund**')
- with open('inventory.json', 'w') as f:
-   json.dump(inventory, f)
   
 @client.command()
 async def shop(ctx):
@@ -617,99 +586,108 @@ async def shop(ctx):
  embed.add_field(name='[2] :archery: / 20 000 <:TACoin:806882594519515146>', value='Zvyšuje se šance na zvířata co můžeš chytit s :knife: Navíc můžeš chytit :bird:', inline=False)
  embed.add_field(name='[3] :spoon: / 50 000 <:TACoin:806882594519515146>', value='Zvyšuje se šance na zvířata co můžeš chytit s :knife: a :archery: Navíc můžeš chytit :rabbit2: a :unicorn:', inline=False)
  embed.add_field(name='[4] <:otrok:824609734778421258> / 15 000 <:TACoin:806882594519515146>', value='Kup si otroka a rozšiř si tak místo v inventáři o 50!', inline=False)
+ embed.add_field(name='[5]  ⭐SWAG/ 20 000 <:TACoin:806882594519515146>', value='Kup si roli ⭐SWAG, budeš výše v tabu a můžeš měnit přezdívky!!', inline=False)
  embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí !buy *čislo předmětu*')
  await ctx.send(embed=embed)
 
-@client.command()
+@client.command(pass_context=True)
 async def buy(ctx, number_buy):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
   user = ctx.author
   server = ctx.guild
-  await coin_update(inventory, user, server)
-  capacity = await capacity_check(inventory, user, server)
-  my_capacity = inventory[str(user.id) + '-' + str(server.id)]['inventory']['capacity']
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
+  capacity = await capacity_check(user, server)
+  my_capacity = stats['capacity']
   if capacity >= my_capacity:
    await ctx.send('Nemáš místo v inventáři...')
   else:
     if number_buy == '1':
-      try_number = inventory[str(user.id) + '-' + str(server.id)]['money'] - 5000
+      try_number = stats['money'] - 5000
       if try_number >= 0:
-      
-        inventory[str(user.id) + '-' + str(server.id)]['money'] -= 5000
-        inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][':knife:'] = 1
+        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
+        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':knife:': 1}})
         await ctx.send('Koupil sis :knife:')
       else:
         await ctx.send('Nemáš dostatek peněz na :knife:')
     if number_buy == '2':
-      try_number = inventory[str(user.id) + '-' + str(server.id)]['money'] - 20000
+      try_number = stats['money'] - 20000
       if try_number >= 0:
-      
-        inventory[str(user.id) + '-' + str(server.id)]['money'] -= 20000
-        inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][':archery:'] = 1
+        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
+        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':archery:': 1}})
         await ctx.send('Koupil sis :archery:')
       else:
         await ctx.send('Nemáš dostatek peněz na :archery:')
     if number_buy == '3':
-      try_number = inventory[str(user.id) + '-' + str(server.id)]['money'] - 50000
+      try_number = stats['money'] - 50000
       if try_number >= 0:
-      
-        inventory[str(user.id) + '-' + str(server.id)]['money'] -= 50000
-        inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][':spoon:'] = 1
+        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
+        things.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{':spoon:': 1}})
         await ctx.send('Koupil sis :spoon:')
       else:
         await ctx.send('Nemáš dostatek peněz na :spoon:')
     if number_buy == '4':
-      try_number = inventory[str(user.id) + '-' + str(server.id)]['money'] - 15000
+      try_number = stats['money'] - 15000
       if try_number >= 0:
-      
-        inventory[str(user.id) + '-' + str(server.id)]['money'] -= 15000
-        inventory[str(user.id) + '-' + str(server.id)]['inventory']['capacity'] += 50
+        result = stats['capacity'] + 50     
+        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
+        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'capacity': result}})
         await ctx.send('Koupil sis <:otrok:824609734778421258>')
       else:
         await ctx.send('Nemáš dostatek peněz na <:otrok:824609734778421258>')
-  with open('inventory.json', 'w') as f:
-    json.dump(inventory, f)
+    if number_buy == '5':
+      try_number = stats['money'] - 20000
+      if try_number >= 0:
+        role = discord.utils.find(lambda r: r.name == '⭐SWAG', ctx.guild.roles)
+        role2 = discord.utils.find(lambda r: r.name == 'Aby Byl Dlaba Spokojen', ctx.guild.roles)
+        if role not in ctx.author.roles:
+         inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': try_number}})
+        
+         await ctx.author.add_roles(role)
+         await ctx.author.add_roles(role2)
+         await ctx.send('Koupil sis ⭐SWAG')
+        else:
+          await ctx.send('Roli ⭐SWAG už máš!')
+      else:
+        await ctx.send('Nemáš dostatek peněz na roli ⭐SWAG')
+
 
 @client.command()
 async def send(ctx, money = None, member: discord.Member = None):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
   user = ctx.author
   server = ctx.guild
-  await coin_update(inventory, user, server)
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  stats2 = inventory.find_one({'id': str(member.id), 'server': str(server.id)})
   if member == None:
     await ctx.send('Musíš napsat komu chceš peníze poslat!')
   elif money == None:
     await ctx.send('Musíš napsat kolik chceš dotyčnému poslat!')
   else:
-    check_price = inventory[str(user.id) + '-' + str(server.id)]['money'] - int(money)
+    check_price = stats['money'] - int(money)
     if check_price >= 0:
-      inventory[str(user.id) + '-' + str(server.id)]['money'] -= int(money)
-      inventory[str(member.id) + '-' + str(server.id)]['money'] += int(money)
+      result = stats['money'] - int(money)
+      result2 = stats2['money'] + int(money)
+      inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': result}})
+      inventory.update_one({'id': str(member.id), 'server': str(server.id)}, {'$set':{'money': result2}})
       await ctx.send(f'Poslal jsi {member.mention} svých {money} <:TACoin:806882594519515146>')
     else:
       await ctx.send('Nemáš dost <:TACoin:806882594519515146> na tuto platbu xd. Poor')
 
-  
-
-  with open('inventory.json', 'w') as f:
-    json.dump(inventory, f)
-
 
 @client.command()
 async def sell(ctx, item, count = None):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
   user = ctx.author
   server = ctx.guild
-  await coin_update(inventory, user, server)
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
   if count == None:
     count = 1
   if f':{item}:' not in sell_list:
     await ctx.send('Toto zvíře neznám...')
   elif f':{item}:' in sell_list:
-    check_item = inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][f':{item}:'] - int(count)
+    check_item = things[f':{item}:'] - int(count)
     x = 0
     for i in sell_list:
       if i == f':{item}:':
@@ -717,25 +695,26 @@ async def sell(ctx, item, count = None):
         break
       x += 1
     if check_item >= 0:
-     inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][f':{item}:'] -= int(count)
-     inventory[str(user.id) + '-' + str(server.id)]['money'] += int(count) * price_list[pos_of_item]
+     result = things[f':{item}:'] - int(count)
+     animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{f':{item}:': result}})
+     money_result = stats['money'] + int(count) * price_list[pos_of_item]
+     inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': money_result}})
+     
      await ctx.send(f'Prodal jsi {count} :{item}: za {int(count) * price_list[pos_of_item]} <:TACoin:806882594519515146>')
     else:
       await ctx.send(f'Nemáš dostatek :{item}: na prodej...')
-  with open('inventory.json', 'w') as f:
-    json.dump(inventory, f)
 
 @client.command()
 async def hunt(ctx):
   user = ctx.author
   server = ctx.guild
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
-  await coin_update(inventory, user, server)
-  capacity = await capacity_check(inventory, user, server)
-  start = await coin_add(inventory, user, server, 'time3', 120)
-  pending = 120 - (time.time() - inventory[str(user.id) + '-' + str(server.id)]['time3'])
-  my_capacity =  inventory[str(user.id) + '-' + str(server.id)]['inventory']['capacity']
+  await coin_update(user, server)
+  capacity = await capacity_check(user, server)
+  start = await coin_add(user, server, 'time3', 120)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
+  pending = 120 - (time.time() - stats['time3'])
+  my_capacity =  stats['capacity']
 
   if start == True:
     
@@ -748,27 +727,33 @@ async def hunt(ctx):
       
       
       if choice[0] == 0:
-        if ':knife:' in inventory[str(user.id) + '-' + str(server.id)]['inventory']['things']:
-         catch = random.choices(hunt_list, [50, 30, 15, 3, 5, 0, 3, 5, 0, 0])
-        elif ':archery:' in inventory[str(user.id) + '-' + str(server.id)]['inventory']['things']:
-         catch = random.choices(hunt_list, [60, 40, 17, 3, 7, 3, 5, 10, 0, 0])
-        elif ':spoon:' in inventory[str(user.id) + '-' + str(server.id)]['inventory']['things']:
-          catch = random.choices(hunt_list, [70, 50, 20, 3, 10, 5, 10, 20, 5, 1])
+        if ':knife:' in things:
+         catch = random.choices(hunt_list, [50, 30, 15, 3, 5, 0, 3, 5, 0, 0, 20])
+        elif ':archery:' in things:
+         catch = random.choices(hunt_list, [60, 40, 17, 3, 7, 3, 5, 10, 0, 0, 20])
+        elif ':spoon:' in things:
+          catch = random.choices(hunt_list, [70, 50, 20, 3, 10, 5, 10, 20, 5, 1, 20])
         else:
-          catch = random.choices(hunt_list, [40, 20, 5, 3, 0, 0, 0, 0, 0, 0])
+          catch = random.choices(hunt_list, [40, 20, 5, 3, 0, 0, 0, 0, 0, 0, 20])
         try:
-         if catch[0] == ':knife:':
-            if inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][':knife:'] > 0:
-             await ctx.send(':knife: už máš... Nic jsi nenašel.')
+          if catch[0] == ':knife:':
+            if things[':knife:'] > 0:
+              await ctx.send(':knife: už máš... Nic jsi nenašel.')
             else:
-             await ctx.send(f'Našel jsi {catch[0]}!! Tvoje šance na chycení :hamster: jsou 2x vyšší a šance na chycení :bear: se zvýšila o 1,5!!') 
-             inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][catch[0]] = 1
-         else:
-           inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][catch[0]] += 1
-           await ctx.send(f'Chytil jsi {catch[0]}')
+              await ctx.send(f'Našel jsi {catch[0]}!! Tvoje šance na chycení :hamster: jsou 2x vyšší a šance na chycení :bear: se zvýšila o 1,5!!') 
+              animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{catch[0]: 1}})
+          elif catch[0] == '<:kalda:829322764065701889>':
+              kalda_money = random.choice(range(10, 100))
+              result = stats['money'] + kalda_money
+              await ctx.send(f'Našel jsi {catch[0]} . Okradl jsi ho a našel jsi {kalda_money} <:TACoin:806882594519515146> . <:TriHard:806263536921608212>')
+              inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money' : result}})
+          else:
+            number_catch = things[catch[0]] + 1
+            animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{catch[0]: number_catch}})
+            await ctx.send(f'Chytil jsi {catch[0]}')
         except:
-           await ctx.send(f'Chytil jsi {catch[0]}. Tvůj první kousek <:poggers:824280503590322277>')
-           inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'][catch[0]] = 1
+            animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{catch[0]: 1}})
+            await ctx.send(f'Chytil jsi {catch[0]} Tvůj první kousek <:poggers:824280503590322277>')
       elif choice[0] == 1:
         catch = random.choices(fail_text)
         await ctx.send(catch[0])
@@ -776,9 +761,6 @@ async def hunt(ctx):
     minutes = pending / 60
     await ctx.send (f'Znova můžeš použít příkaz za **{int(minutes)} minut** a **{int(pending % 60)} vteřin**')
 
-
-  with open('inventory.json', 'w') as f:
-    json.dump(inventory, f)
 
 
 
@@ -799,28 +781,32 @@ async def prices(ctx):
 
 
 
-@client.command()
-async def inventory(ctx, user: discord.Member = None):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
-    if user == None:
-     user = ctx.author
+@client.command(aliases=['inventory'])
+async def inventory_command(ctx, user: discord.Member = None):
+  if user == None:
+    user = ctx.author
   server = ctx.guild
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
   number = []
-  await coin_update(inventory, user, server)
-  coins = inventory[str(user.id) + '-' + str(server.id)]['money']
-  things = inventory[str(user.id) + '-' + str(server.id)]['inventory']['things']
-  for i in things:
-    number.append(str(things[i]))
-  capacity = await capacity_check(inventory, user, server)
-  my_capacity = inventory[str(user.id) + '-' + str(server.id)]['inventory']['capacity']
-
+  thing_list = []
+  coins = stats['money']
+  for i in sell_list:
+    if i in things:
+     number.append(things[i])
+  for i in sell_list:
+    if i in things:
+     thing_list.append(str(i))
+  capacity = await capacity_check(user, server)
+  my_capacity = stats['capacity']
+   
   
   try:
    embed=discord.Embed(title="Inventář", description="Toto je seznam věcí které máš:", color=0x1926e1)
    embed.set_author(name=user.name, icon_url= user.avatar_url)
    embed.add_field(name="Peníze", value=f"{coins} <:TACoin:806882594519515146>", inline=True)
-   embed.add_field(name=f'Věci {capacity} / {my_capacity} <:otrok:824609734778421258>' , value= "\n".join("{} × {}".format(x, y) for x, y in zip(number, things)) , inline=False)
+   embed.add_field(name=f'Věci {capacity} / {my_capacity} <:otrok:824609734778421258>' , value= "\n".join("{} × {}".format(x, y) for x, y in zip(number, thing_list)) , inline=False)
    embed.set_thumbnail(url= 
    'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
    await ctx.send(embed=embed)
@@ -833,81 +819,78 @@ async def inventory(ctx, user: discord.Member = None):
    await ctx.send(embed=embed)
 
 
-  with open('inventory.json', 'w') as f:
-    json.dump(inventory, f)
 
   
 @client.command()
 async def daily(ctx):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
   user = ctx.author
   server = ctx.guild
-  await coin_update(inventory, user, server)
-  pending_s  = 86400 - (time.time() - inventory[str(user.id) + '-' + str(server.id)]['time'])
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  pending_s  = 86400 - (time.time() - stats['time'])
   pending_m = pending_s / 60
   pending_h = pending_m / 60
   pending_s_final = pending_s % 60
   pending_m_final = pending_m % 60
   
-  answer = await coin_add_24(inventory, user, server, 300)
+  answer = await coin_add_24(user, server, 300)
   if answer == True:
     await ctx.send('Vyzvednul sis denní odměnu 300 <:TACoin:806882594519515146>')
   elif answer == False:
     await ctx.send(f'Dnes sis již vyzvedl <:TACoin:806882594519515146>. Znova si jej můžeš vyzvednout za `{int(pending_h)} hodin {int(pending_m_final)} minut {int(pending_s_final)} vteřin`')
 
-  with open('inventory.json', 'w') as f:
-   json.dump(inventory, f)
+
 
 
 @client.command()
 async def money(ctx, user: discord.Member = None, aliases = 'balance'):
-  with open('inventory.json', 'r') as f:
-    inventory = json.load(f)
-    server = ctx.guild
+  
+  server = ctx.guild
 
-    if user == None:
-      user = ctx.author
+  if user == None:
+    user = ctx.author
+  await coin_update(user, server)
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
 
-  await coin_update(inventory, user, server)
-  money = inventory[str(user.id) + '-' + str(server.id)]['money']
+
+  money = stats['money']
   await ctx.send(f'Máš {money} <:TACoin:806882594519515146>')
 
-  with open('inventory.json', 'w') as f:
-   json.dump(inventory, f)
 
-async def coin_add_24(inventory, user, server, money):
-  if time.time() - inventory[str(user.id) + '-' + str(server.id)]['time'] > 86400:
-    inventory[str(user.id) + '-' + str(server.id)]['money'] += money
-    inventory[str(user.id) + '-' + str(server.id)]['time'] = time.time()
+async def coin_add_24(user, server, money):
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  if time.time() - stats['time'] > 86400:
+    money_update = stats['money'] + money
+    inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{'money': money_update, 'time': time.time()}})
     return(True)
   else:
     return(False)
 
-async def coin_update(inventory, user, server):
-  if not str(user.id) + '-' + str(server.id) in inventory: 
-   inventory[str(user.id) + '-' + str(server.id)] = {}
-   inventory[str(user.id) + '-' + str(server.id)]['money'] = 0
-   inventory[str(user.id) + '-' + str(server.id)]['time'] = 0
-   inventory[str(user.id) + '-' + str(server.id)]['time2'] = 0
-   inventory[str(user.id) + '-' + str(server.id)]['time3'] = 0
-   inventory[str(user.id) + '-' + str(server.id)]['inventory'] ={}
-   inventory[str(user.id) + '-' + str(server.id)]['inventory']['things'] = {}
-   inventory[str(user.id) + '-' + str(server.id)]['inventory']['capacity'] = 25
+async def coin_update(user, server):
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
+  if stats == None: 
+   newuser = {'id': str(user.id), 'server': str(server.id), 'money': 0, 'time': 0, 'time2': 0, 'time3': 0, 'capacity': 25}
+   inventory.insert_one(newuser)
+  if things == None: 
+   newuser = {'id': str(user.id), 'server': str(server.id)}
+   animals.insert_one(newuser)
 
-async def capacity_check(inventory, user, server):
-  things = inventory[str(user.id) + '-' + str(server.id)]['inventory']['things']
+async def capacity_check(user, server):
+  things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
   number_of_things = 0
-  for i in things:
-   number_of_things += things[i]
+  for i in sell_list:
+    if i in things:
+     number_of_things += things[i]
   return(number_of_things)
      
 
-async def coin_add(inventory, user, server, time_clock, time_wait):
-  if time.time() - inventory[str(user.id) + '-' + str(server.id)][time_clock] >= time_wait:
-    inventory[str(user.id) + '-' + str(server.id)][time_clock] = time.time()
+async def coin_add(user, server, time_clock, time_wait):
+  stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+  if time.time() - stats[time_clock] >= time_wait:
+    inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set':{time_clock: time.time()}})
     return(True)
-  elif time.time() - inventory[str(user.id) + '-' + str(server.id)][time_clock] < time_wait:
+  elif time.time() - stats[time_clock] < time_wait:
     return(False)
 
 def unescape(s):
