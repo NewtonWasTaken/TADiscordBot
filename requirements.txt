@@ -3,3 +3,4 @@ KahootPY
 google_trans_new
 pymongo
 flask
+dnspython
