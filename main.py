@@ -905,7 +905,7 @@ async def play(ctx, *, url):
         for file in os.listdir("./"):
             if file.endswith(".mp3"):
                 os.rename(file, "song.mp3")
-        voice.play(discord.FFmpegPCMAudio('song.mp3'))
+        voice.play(discord.FFmpegPCMAudio('Mafia - Definitive Edition Soundtrack - Sarah-lfSKqkA_1Lk.mp3'))
 
 
 
