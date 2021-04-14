@@ -885,12 +885,13 @@ async def play(ctx, *, url):
     if not voice.channel.id == ctx.author.voice.channel.id:
         await ctx.send('Nejsi připojen na stejném kanálu jako bot, nebo není bot připojen k tobě...')
     else:
-        playing_song = os.path.isfile(f'song-{ctx.guild.id}.mp3')
+        playing_song = os.path.isfile(f'song.mp3')
         try:
             if playing_song:
-                os.remove(f'song-{ctx.guild.id}.mp3')
+                os.remove(f'song.mp3')
         except PermissionError:
             await ctx.send('Počkej až dohraje skladba co právě hraje...')
+
         ydl_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
@@ -904,7 +905,7 @@ async def play(ctx, *, url):
         for file in os.listdir("./"):
             if file.endswith(".mp3"):
                 os.rename(file, "song.mp3")
-        voice.play(discord.FFmpegPCMAudio("song.mp3"))
+        voice.play(discord.FFmpegPCMAudio('song.mp3'))
 
 
 
@@ -955,5 +956,6 @@ def unescape(s):
 
 
 client.run(os.getenv('TOKEN'))
+
 
 
