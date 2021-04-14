@@ -34,10 +34,18 @@ price_list = [50, 75, 150, 4000, 200, 500, 250, 200, 600, 5000, 17000, 45000, 0]
 fail_text = ['Našel jsi :teddy_bear: hodil jsi ho do popelnice...', 'Našel jsi dva dny staré :newspaper2:, jediný co ses dozvěděl je že zase prodloužili lockdown...', 'Našel jsi :knot: Myslím že ti bude k ničemu...','Našel jsi :knife:, ale byl plastovej xd', 'Našel jsi :french_bread:, a snědl jsi ji, takže teď už nemáš nic :)','Našel jsi :bread:, a snědl jsi ho, takže teď už nemáš nic :)', 'Našel jsi :knot:, takže se konečně můžeš oběsit...']
 pp = ['8D', '8=D', '8==D', '8===D', '8====D', '8=====D', '8======D', '8=======D', '8========D']
 
-
-
+ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+        }
+FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 life = ['Žiju!', 'Nežiju!']
 distribution = [.9, .1]
+song_queue = []
 
 flaska1 = []
 flaska2 = []
@@ -46,10 +54,6 @@ flaska4 = []
 
 @client.event
 async def on_message(message):
-  if message.content.startswith('p!play https://www.youtube.com/playlist?list=PL3WrFU8w7SuJcMPrz77_yJWbRQGMRvhic'):
-    time.sleep(1)
-    await message.channel.send('p!disconnect')
-
   if message.author.bot:
     return
   
@@ -864,44 +868,71 @@ async def connect(ctx):
         if voice == None:
             channel = ctx.author.voice.channel
             await channel.connect()
+            await ctx.guild.change_voice_state(channel=channel, self_deaf=True)
             await ctx.send('Bot připojen na voice!')
+            return(True)
         else:
+            return (True)
             await ctx.send('Bot už je připojen jinde')
+
 
 
 @client.command()
 async def leave(ctx):
-    channel = ctx.author.voice.channel.id
+    channel = ctx.author.voice
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if not channel == voice.channel.id:
+    if channel == None:
         await ctx.send('Musíš být připojen do kanálu na odpojení bota')
-    else:
+    elif voice.channel.id == ctx.author.voice.channel.id:
         channel = ctx.author.voice.channel
         await voice.disconnect()
         await ctx.send('Bot byl odpojen z voicu!')
+        song_queue = []
+    else:
+        await ctx.send('Musíš být připojen do stejného kanálu na odpojení bota')
 @client.command()
 async def play(ctx, *, url):
-    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if not voice.channel.id == ctx.author.voice.channel.id:
-        await ctx.send('Nejsi připojen na stejném kanálu jako bot, nebo není bot připojen k tobě...')
+    blacklist = open('blacklist.txt', 'r')
+    blacklist2 = blacklist.read().splitlines()
+    if not url in blacklist2:
+        if await connect(ctx):
+            voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+            song = search(url, ctx.author)
+            song_queue.append(song)
+            if not voice.is_playing():
+                voice.play(discord.FFmpegPCMAudio(song['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+                voice.is_playing()
+                embed = discord.Embed(title="Hudba", color=0x1927e6)
+                embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                embed.add_field(name="Právě hraje", value=f"[{song['title']}]({song['link']})", inline=False)
+                embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
+                await ctx.send(embed=embed)
+            else:
+                embed = discord.Embed(title="Hudba", color=0x1927e6)
+                embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                embed.add_field(name="Přidáno do řady", value=f"[{song['title']}]({song['link']})", inline=False)
+                embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
+                await ctx.send(embed=embed)
     else:
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-        }
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-        URL = info['formats'][0]['url']
-        voice.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+        await ctx.send('Tenhle song je blacklistnutý nepouštěj ho chuju!!')
 
 
 
+
+
+def play_next(ctx):
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if len(song_queue) > 1:
+        del song_queue[0]
+        voice.play(discord.FFmpegPCMAudio(song_queue[0]['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+        voice.is_playing()
+
+
+
+def search(arg, user):
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(arg, download=False)
+    return {'source': info['formats'][0]['url'], 'title': info['title'], 'link': f'https://www.youtube.com/watch?v={info["id"]}', 'user': user}
 
 
 async def coin_add_24(user, server, money):
@@ -922,6 +953,7 @@ async def coin_update(user, server):
   if things == None: 
    newuser = {'id': str(user.id), 'server': str(server.id)}
    animals.insert_one(newuser)
+
 
 async def capacity_check(user, server):
   things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
