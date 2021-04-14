@@ -9,7 +9,7 @@ import requests
 import asyncio
 from google_trans_new import google_translator
 import pymongo
-
+import youtube_dl
 
 
 
@@ -855,12 +855,58 @@ async def money(ctx, user: discord.Member = None, aliases = 'balance'):
 
 
 @client.command()
-async def play(ctx, *, url):
-    channel = ctx.author.voice.channel
+async def connect(ctx):
+    channel = ctx.author.voice
+    voice = discord.utils.get(client.voice_clients, guild= ctx.guild)
     if channel == None:
         await ctx.send('Musíš být připojen do kanálu na připojení bota')
     else:
-        await channel.connect()
+        if voice == None:
+            channel = ctx.author.voice.channel
+            await channel.connect()
+            await ctx.send('Bot připojen na voice!')
+        else:
+            await ctx.send('Bot už je připojen jinde')
+
+
+@client.command()
+async def leave(ctx):
+    channel = ctx.author.voice.channel.id
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if not channel == voice.channel.id:
+        await ctx.send('Musíš být připojen do kanálu na odpojení bota')
+    else:
+        channel = ctx.author.voice.channel
+        await voice.disconnect()
+        await ctx.send('Bot byl odpojen z voicu!')
+@client.command()
+async def play(ctx, *, url):
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if not voice.channel.id == ctx.author.voice.channel.id:
+        await ctx.send('Nejsi připojen na stejném kanálu jako bot, nebo není bot připojen k tobě...')
+    else:
+        playing_song = os.path.isfile(f'song-{ctx.guild.id}.mp3')
+        try:
+            if playing_song:
+                os.remove(f'song-{ctx.guild.id}.mp3')
+        except PermissionError:
+            await ctx.send('Počkej až dohraje skladba co právě hraje...')
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        for file in os.listdir("./"):
+            if file.endswith(".mp3"):
+                os.rename(file, "song.mp3")
+        voice.play(discord.FFmpegPCMAudio("song.mp3"))
+
+
 
 
 
@@ -909,4 +955,5 @@ def unescape(s):
 
 
 client.run(os.getenv('TOKEN'))
+
 

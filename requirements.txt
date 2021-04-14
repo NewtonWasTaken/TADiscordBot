@@ -14,3 +14,6 @@ SQLAlchemy
 Werkzeug
 gunicorn
 gevent
+ffmpeg
+pynacl
+youtube_dl
