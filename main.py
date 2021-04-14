@@ -854,6 +854,16 @@ async def money(ctx, user: discord.Member = None, aliases = 'balance'):
   await ctx.send(f'Máš {money} <:TACoin:806882594519515146>')
 
 
+@client.command()
+async def play(ctx, *, url):
+    channel = ctx.author.voice.channel
+    if channel == None:
+        await ctx.send('Musíš být připojen do kanálu na připojení bota')
+    else:
+        await channel.connect()
+
+
+
 async def coin_add_24(user, server, money):
   stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
   if time.time() - stats['time'] > 86400:
