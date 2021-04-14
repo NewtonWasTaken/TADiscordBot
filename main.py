@@ -881,17 +881,12 @@ async def leave(ctx):
         await ctx.send('Bot byl odpojen z voicu!')
 @client.command()
 async def play(ctx, *, url):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     if not voice.channel.id == ctx.author.voice.channel.id:
         await ctx.send('Nejsi připojen na stejném kanálu jako bot, nebo není bot připojen k tobě...')
     else:
-        playing_song = os.path.isfile(f'song.mp3')
-        try:
-            if playing_song:
-                os.remove(f'song.mp3')
-        except PermissionError:
-            await ctx.send('Počkej až dohraje skladba co právě hraje...')
-
         ydl_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
@@ -901,11 +896,9 @@ async def play(ctx, *, url):
             }],
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                os.rename(file, "song.mp3")
-        voice.play(discord.FFmpegPCMAudio('song.mp3'))
+            info = ydl.extract_info(url, download=False)
+        URL = info['formats'][0]['url']
+        voice.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
 
 
 
