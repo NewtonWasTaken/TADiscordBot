@@ -45,7 +45,7 @@ ydl_opts = {
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 life = ['Žiju!', 'Nežiju!']
 distribution = [.9, .1]
-song_queue = []
+song_queue = {}
 
 flaska1 = []
 flaska2 = []
@@ -318,6 +318,7 @@ async def help(ctx):
     embed.add_field(name="Rank systém :chart_with_upwards_trend: ", value = "`rank` ", inline=False)
     embed.add_field(name="Minecraft server :tent: ", value = "`server` `server status` ", inline=False)
     embed.add_field(name="Ekonomika <:TACoin:806882594519515146> ", value = "`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `kviz cz` `sell` `buy` `prices` ", inline=False)
+    embed.add_field(name="Hudba :notes: ", value="`join` `leave` `play **url**` `skip` `pause` `resume`", inline=False)
     embed.set_footer(
         text=
         "Pokud chcete o něčem zjistit více napište !help s čím chcete pomoct, například !help flaska."
@@ -884,10 +885,8 @@ async def leave(ctx):
     if channel == None:
         await ctx.send('Musíš být připojen do kanálu na odpojení bota')
     elif voice.channel.id == ctx.author.voice.channel.id:
-        channel = ctx.author.voice.channel
         await voice.disconnect()
         await ctx.send('Bot byl odpojen z voicu!')
-        song_queue = []
     else:
         await ctx.send('Musíš být připojen do stejného kanálu na odpojení bota')
 @client.command()
@@ -898,14 +897,18 @@ async def play(ctx, *, url):
         if await connect(ctx):
             voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
             song = search(url, ctx.author)
-            song_queue.append(song)
+            try:
+                song_queue[str(ctx.guild.id)].append(song)
+            except:
+                song_queue[str(ctx.guild.id)] = []
+                song_queue[str(ctx.guild.id)].append(song)
             if not voice.is_playing():
-                voice.play(discord.FFmpegPCMAudio(song['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+                voice.play(discord.FFmpegPCMAudio(song_queue[str(ctx.guild.id)][0]['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
                 voice.is_playing()
                 embed = discord.Embed(title="Hudba", color=0x1927e6)
                 embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
-                embed.add_field(name="Právě hraje", value=f"[{song['title']}]({song['link']})", inline=False)
-                embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
+                embed.add_field(name="Právě hraje", value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})", inline=False)
+                embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][0]['user'].mention}", inline=False)
                 await ctx.send(embed=embed)
             else:
                 embed = discord.Embed(title="Hudba", color=0x1927e6)
@@ -916,17 +919,71 @@ async def play(ctx, *, url):
     else:
         await ctx.send('Tenhle song je blacklistnutý nepouštěj ho chuju!!')
 
-
-
-
-
-def play_next(ctx):
+@client.command()
+async def skip(ctx):
+    channel = ctx.author.voice
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if len(song_queue) > 1:
-        del song_queue[0]
-        voice.play(discord.FFmpegPCMAudio(song_queue[0]['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
-        voice.is_playing()
+    if channel == None:
+        await ctx.send('Musíš být připojen do kanálu na skipnutí songu')
+    elif voice.channel.id == ctx.author.voice.channel.id:
+        if voice.is_playing():
+            skip_song(ctx)
+        else:
+            await ctx.send('Nic nehraje...')
+    else:
+        await ctx.send('Musíš být připojen do stejného kanálu na skipnutí')
 
+@client.command()
+async def pause(ctx):
+    channel = ctx.author.voice
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if channel == None:
+        await ctx.send('Musíš být připojen do kanálu na pausnutí songu')
+    elif voice.channel.id == ctx.author.voice.channel.id:
+        if voice.is_playing():
+            voice.pause()
+            await ctx.send('Pozasatveno :pause_button:')
+        else:
+            await ctx.send('Nic nehraje...')
+    else:
+        await ctx.send('Musíš být připojen do stejného kanálu na pause')
+
+@client.command()
+async def resume(ctx):
+    channel = ctx.author.voice
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if channel == None:
+        await ctx.send('Musíš být připojen do kanálu na pausnutí songu')
+    elif voice.channel.id == ctx.author.voice.channel.id:
+
+        voice.resume()
+        await ctx.send('Pokračujeme... :play_pause:')
+
+    else:
+        await ctx.send('Musíš být připojen do stejného kanálu na pause')
+
+def skip_song(ctx):
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if len(song_queue[str(ctx.guild.id)]) > 0:
+        voice.stop()
+        asyncio.run_coroutine_threadsafe(ctx.send('Skipnuto :white_check_mark:'), client.loop)
+def play_next(ctx):
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if len(song_queue[str(ctx.guild.id)]) > 1:
+            del song_queue[str(ctx.guild.id)][0]
+            voice.play(discord.FFmpegPCMAudio(song_queue[str(ctx.guild.id)][0]['source'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+            voice.is_playing()
+            embed = discord.Embed(title="Hudba", color=0x1927e6)
+            embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+            embed.add_field(name="Právě hraje", value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})", inline=False)
+            embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][0]['user'].mention}", inline=False)
+            asyncio.run_coroutine_threadsafe(ctx.send(embed=embed), client.loop)
+        else:
+            try:
+                del song_queue[str(ctx.guild.id)][0]
+                asyncio.run_coroutine_threadsafe(ctx.send('Konec řady. :white_check_mark:'), client.loop)
+            except:
+                asyncio.run_coroutine_threadsafe(ctx.send('Konec řady. :white_check_mark:'), client.loop)
 
 
 def search(arg, user):
