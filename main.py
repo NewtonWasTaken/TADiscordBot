@@ -885,6 +885,7 @@ async def leave(ctx):
     if channel == None:
         await ctx.send('Musíš být připojen do kanálu na odpojení bota')
     elif voice.channel.id == ctx.author.voice.channel.id:
+        song_queue[str(ctx.guild.id)] = []
         await voice.disconnect()
         await ctx.send('Bot byl odpojen z voicu!')
     else:
@@ -893,10 +894,12 @@ async def leave(ctx):
 async def play(ctx, *, url):
     blacklist = open('blacklist.txt', 'r')
     blacklist2 = blacklist.read().splitlines()
-    if not url in blacklist2:
-        if await connect(ctx):
-            voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-            song = search(url, ctx.author)
+    if await connect(ctx):
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        song = search(url, ctx.author)
+        if song['id'] in blacklist2:
+            await ctx.send('Tenhle song je blacklistnutý, nepouštěj ho ty chuju.')
+        else:
             try:
                 song_queue[str(ctx.guild.id)].append(song)
             except:
@@ -916,8 +919,6 @@ async def play(ctx, *, url):
                 embed.add_field(name="Přidáno do řady", value=f"[{song['title']}]({song['link']})", inline=False)
                 embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
                 await ctx.send(embed=embed)
-    else:
-        await ctx.send('Tenhle song je blacklistnutý nepouštěj ho chuju!!')
 
 @client.command()
 async def skip(ctx):
@@ -989,7 +990,7 @@ def play_next(ctx):
 def search(arg, user):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(arg, download=False)
-    return {'source': info['formats'][0]['url'], 'title': info['title'], 'link': f'https://www.youtube.com/watch?v={info["id"]}', 'user': user}
+    return {'source': info['formats'][0]['url'], 'title': info['title'], 'link': f'https://www.youtube.com/watch?v={info["id"]}', 'user': user, 'id': info['id']}
 
 
 async def coin_add_24(user, server, money):
