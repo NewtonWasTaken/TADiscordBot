@@ -23,7 +23,6 @@ class Ranking(commands.Cog):
 
     @commands.command()
     async def rank(self, ctx, member: discord.Member = None):
-        print(1)
         if member is None:
             member = ctx.message.author
         server = ctx.message.guild
