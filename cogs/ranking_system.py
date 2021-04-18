@@ -71,11 +71,11 @@ class Ranking(commands.Cog):
 
     def level_up(self, user, server):
         stats = users.find_one({'id': str(user.id), 'server': str(server.id)})
+        exp = stats['xp']
         if server.id == 693009303526703134:
             channel = self.client.get_channel(826042384558063617)
         if server.id == 806808047509831700:
             channel = self.client.get_channel(807246401607827536)
-            exp = stats['xp']
             lvl_end = stats['level'] + 1
             finish = lvl_end ** (1 / (1 / 4))
 
