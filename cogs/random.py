@@ -22,7 +22,7 @@ class Random(commands.Cog):
         else:
             meme()
 
-    @commands.group(name='student', invoke_without_command=True)
+    @commands.group(name='student', invoke_without_command=True, help='Zobrazí náhodnou hlášku studenta z naší třídy', usage='!student <add> [hláška] \nadd: nepovinný, přidá další hlášku')
     async def student(self, ctx):
         roasty = open(os.path.dirname(__file__) + '/../roasts.txt', 'r', encoding='utf-8')
         roasty2 = roasty.read().splitlines()
@@ -51,19 +51,19 @@ class Random(commands.Cog):
         f.close()
         s.close()
 
-    @commands.command()
+    @commands.command(help='Testovací zpráva jestli bot žije', usage='!status')
     async def status(self, ctx):
         rng = random.choices(life, distribution)
         await ctx.send(''.join(rng))
 
-    @commands.command()
+    @commands.command(help='Napíše na kolik % jsi gay', usage='!howgay (uživatel-nepovinný)')
     async def howgay(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.message.author
         await ctx.send(
             f'{member.mention} jsi na {random.randrange(1, 100, 3)}% gay. <:rainbow_flag:811896666848100363>')
 
-    @commands.command()
+    @commands.command(help='Napíše koho simpíš a na kolik %.', usage='!simp (uživatel-nepovinný)')
     async def simp(self, ctx, member: discord.Member = None):
         input = open(os.path.dirname(__file__) + '/../classsimp.txt', 'r', encoding='utf-8')
         ourclasssimp = [str(number) for number in input.readline().split(',')]
@@ -74,20 +74,20 @@ class Random(commands.Cog):
             f'{member.mention} simpíš{random.choice(ourclasssimp)} na {random.randrange(1, 100, 3)}%. <:SIMP:782941806244921354>')
         input.close()
 
-    @commands.command(name='pp')
+    @commands.command(name='pp', help='Ukáže jak máš dlouhý pp.', usage='!pp (uživatel-nepovinný)')
     async def delka(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.message.author
         await ctx.send(f'{member.mention} máš {random.choice(pp)}')
 
-    @commands.command()
+    @commands.command(help='Ukáže náhodného člověka z naší třídy.', usage='!rng')
     async def rng(self, ctx):
         input2 = open(os.path.dirname(__file__) + '/../class.txt', 'r', encoding='utf-8')
         ourclass = [str(number2) for number2 in input2.readline().split(',')]
         await ctx.send(f'Náhodný člověk z naší třídy:{random.choice(ourclass)}')
         input2.close()
 
-    @commands.group(name='ucitel', invoke_without_command=True)
+    @commands.group(name='ucitel', invoke_without_command=True, help='Ukáže náhodnou hlášku učitele.', usage='!ucitel <add> (hláška) \nadd: nepovinný, přidá další hlášku')
     async def ucitel(self, ctx):
         ucitel = open(os.path.dirname(__file__) + '/../ucitel.txt', 'r', encoding='utf-8')
         ucitel2 = ucitel.read().splitlines()

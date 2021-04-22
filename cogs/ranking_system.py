@@ -21,7 +21,7 @@ class Ranking(commands.Cog):
         self.level_up(message.author, message.guild)
 
 
-    @commands.command()
+    @commands.command(help='Ukáže tvůj rank.', usage='!rank (uživatel-nepovinný)')
     async def rank(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.message.author

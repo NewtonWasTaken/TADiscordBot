@@ -9,7 +9,7 @@ class NSFW(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(help='NSFW obrázek, pouze v roomce NSFW', usage='!nsfw')
     async def nsfw(self, ctx):
         f = requests.get('https://meme-api.herokuapp.com/gimme/nsfw')
         meme = f.json()
@@ -18,14 +18,14 @@ class NSFW(commands.Cog):
         if not ctx.channel.is_nsfw():
             await ctx.send('Tento příkaz může být použit pouze v nsfw kanálu.')
 
-    @commands.command()
+    @commands.command(help='Hláška, nic nebezpečného', usage='!butt')
     async def butt(self, ctx):
         nsfw = open(os.path.dirname(__file__) + '/../nsfw.txt','r', encoding='utf-8')
         nsfw2 = nsfw.read().splitlines()
         print(nsfw2)
         await ctx.send(f'{random.choice(nsfw2)}')
         nsfw.close()
-    @commands.command()
+    @commands.command(help='Další hlášky nic nebezpečného', usage='!boob')
     async def boob(ctx):
         nsfw = open('nsfw.txt', 'r', encoding='utf-8')
         nsfw2 = nsfw.read().splitlines()

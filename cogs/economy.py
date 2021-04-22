@@ -2,6 +2,7 @@ import discord
 import os
 import random
 from discord.ext import commands
+from discord.ext.commands import has_permissions, MissingPermissions
 import json
 import time
 import requests
@@ -26,7 +27,7 @@ translator = google_translator()
 class Ekonomika(commands.Cog):
     def __init__(self, client):
         self.client = client
-    @commands.command(name='inventory', help='Ukáže inventář')
+    @commands.command(name='inventory', help='Ukáže inventář', usage='!inventory (uživatel-nepovinný)')
     async def inventory_command(self, ctx, user: discord.Member = None):
       if user == None:
         user = ctx.author
@@ -63,7 +64,7 @@ class Ekonomika(commands.Cog):
        embed.set_thumbnail(url= 'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
        await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(help='Kvíz o 100 TA Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá zprávou s obsahem 1-4', usage='!kviz <cz> \ncz: nepovinný, kvíz bude přeložen do češtiny')
     async def kviz(self, ctx, language=None):
         if language == None:
             language = 'en'
@@ -167,7 +168,7 @@ class Ekonomika(commands.Cog):
         elif start == False:
             await ctx.send(f'Znova můžeš udělat kvíz za **{int(pending / 60)} minut {int(pending % 60)} sekund**')
 
-    @commands.command()
+    @commands.command(help='Zobrazí seznam věcí co si můžeš koupit.', usage='!shop')
     async def shop(self, ctx):
         embed = discord.Embed(title='Shop', description='Tady si můžeš kupovat různé věci :', color=0x0b49da)
         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
@@ -189,7 +190,7 @@ class Ekonomika(commands.Cog):
         embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí !buy *čislo předmětu*')
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, help='Zakoupení předmětu.', usage='!buy [číslo předmětu]')
     async def buy(self, ctx, number_buy):
         user = ctx.author
         server = ctx.guild
@@ -254,7 +255,7 @@ class Ekonomika(commands.Cog):
                 else:
                     await ctx.send('Nemáš dostatek peněz na roli ⭐SWAG')
 
-    @commands.command()
+    @commands.command(help='Pošle danému člověku daný počet TA Coinů', usage='!send [peníze] [uživatel]')
     async def send(self, ctx, money=None, member: discord.Member = None):
         user = ctx.author
         server = ctx.guild
@@ -276,7 +277,7 @@ class Ekonomika(commands.Cog):
             else:
                 await ctx.send('Nemáš dost <:TACoin:806882594519515146> na tuto platbu xd. Poor')
 
-    @commands.command()
+    @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře]')
     async def sell(self, ctx, item, count=None):
         user = ctx.author
         server = ctx.guild
@@ -306,7 +307,7 @@ class Ekonomika(commands.Cog):
             else:
                 await ctx.send(f'Nemáš dostatek :{item}: na prodej...')
 
-    @commands.command()
+    @commands.command(help='Chytáš zvířata. Použítí jednou za 2 minuty.', usage='!hunt')
     async def hunt(self, ctx):
         user = ctx.author
         server = ctx.guild
@@ -366,7 +367,7 @@ class Ekonomika(commands.Cog):
             minutes = pending / 60
             await ctx.send(f'Znova můžeš použít příkaz za **{int(minutes)} minut** a **{int(pending % 60)} vteřin**')
 
-    @commands.command()
+    @commands.command(help='Denní odměna TA Coinů, můžeš použít jednou za 24h.', usage='!daily')
     async def daily(self, ctx):
         user = ctx.author
         server = ctx.guild
@@ -385,7 +386,7 @@ class Ekonomika(commands.Cog):
             await ctx.send(
                 f'Dnes sis již vyzvedl <:TACoin:806882594519515146>. Znova si jej můžeš vyzvednout za `{int(pending_h)} hodin {int(pending_m_final)} minut {int(pending_s_final)} vteřin`')
 
-    @commands.command()
+    @commands.command(help='Zobrazí jaké zvíře můžeš za kolik prodat.', usage='!prices')
     async def prices(self, ctx):
 
         embed = discord.Embed(title="Ceny", description="Tady vidíte za kolik můžete co prodat!", color=0x0b12ea)
@@ -396,7 +397,7 @@ class Ekonomika(commands.Cog):
             "{} / {} <:TACoin:806882594519515146>".format(x, y) for x, y in zip(sell_list, price_list)), inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(help='Ukáže počet TA Coinů které máš', usage='!money (uživatel-nepovinný)')
     async def money(self, ctx, user: discord.Member = None, aliases='balance'):
 
         server = ctx.guild
@@ -408,6 +409,9 @@ class Ekonomika(commands.Cog):
 
         money = stats['money']
         await ctx.send(f'Máš {money} <:TACoin:806882594519515146>')
+
+
+
 def setup(client):
     client.add_cog(Ekonomika(client))
 

@@ -20,7 +20,7 @@ class Music(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command()
+    @commands.command(help='Připojí bota k tobě na voice.', usage='!connect')
     async def connect(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -37,7 +37,7 @@ class Music(commands.Cog):
                 return (True)
                 await ctx.send('Bot už je připojen jinde')
 
-    @commands.command()
+    @commands.command(help='Odpojí bota z voice.', usage='!leave')
     async def leave(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -50,7 +50,7 @@ class Music(commands.Cog):
         else:
             await ctx.send('Musíš být připojen do stejného kanálu na odpojení bota')
 
-    @commands.command()
+    @commands.command(help='Připojí bota k tobě na voice a přehraje skladbu. Linky pouze z youtube. Nepoužívat playlisty.', usage='!play [link]')
     async def play(self, ctx, *, url):
         blacklist = open('blacklist.txt', 'r', encoding='utf-8')
         blacklist2 = blacklist.read().splitlines()
@@ -86,7 +86,7 @@ class Music(commands.Cog):
                     embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
                     await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(help='Přeskočí song co právě hraje', usage='!skip')
     async def skip(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -100,7 +100,7 @@ class Music(commands.Cog):
         else:
             await ctx.send('Musíš být připojen do stejného kanálu na skipnutí')
 
-    @commands.command()
+    @commands.command(help='Pozastaví aktualní song.', usage='!pause')
     async def pause(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -115,7 +115,7 @@ class Music(commands.Cog):
         else:
             await ctx.send('Musíš být připojen do stejného kanálu na pause')
 
-    @commands.command()
+    @commands.command(help='Opět spustí pozastavený song.', usage='!resume')
     async def resume(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
