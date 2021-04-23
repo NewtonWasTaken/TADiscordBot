@@ -98,5 +98,8 @@ class Funkce(commands.Cog):
             elif command not in command_names_list:
                 await ctx.send('Tenhle command neexistuje')
 
+    @commands.command()
+    async def message(self, ctx, *, message):
+        await ctx.send(message)
 def setup(client):
     client.add_cog(Funkce(client))
