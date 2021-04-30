@@ -3,12 +3,9 @@ from discord.ext import commands
 from google_trans_new import google_translator
 from discord.utils import get
 translator = google_translator()
-
-
 class Funkce(commands.Cog):
     def __init__(self, client):
         self.client = client
-
     @commands.command(help='Nikdy nevíš', usage='!shrug')
     async def shrug(self, ctx):
         await ctx.send('¯\_(ツ)_/¯')
