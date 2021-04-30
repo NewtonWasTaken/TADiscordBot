@@ -328,14 +328,18 @@ class Ekonomika(commands.Cog):
                 choice = random.choices(choice, [60, 40])
 
                 if choice[0] == 0:
-                    if ':knife:' in things:
-                        catch = random.choices(hunt_list, [50, 30, 15, 3, 5, 0, 3, 5, 0, 0, 20])
-                    if ':archery:' in things:
-                        catch = random.choices(hunt_list, [60, 40, 17, 3, 7, 3, 5, 10, 0, 0, 20])
                     if ':spoon:' in things:
                         catch = random.choices(hunt_list, [70, 50, 20, 3, 10, 5, 10, 20, 5, 1, 20])
+                        print('spoon')
+                    elif ':archery:' in things:
+                        catch = random.choices(hunt_list, [60, 40, 17, 3, 7, 3, 5, 10, 0, 0, 20])
+                        print('archery')
+                    elif ':knife:' in things:
+                        catch = random.choices(hunt_list, [50, 30, 15, 3, 5, 0, 3, 5, 0, 0, 20])
+                        print('knife')
                     else:
                         catch = random.choices(hunt_list, [40, 20, 5, 3, 0, 0, 0, 0, 0, 0, 20])
+                        print('hand')
                     try:
                         if catch[0] == ':knife:':
                             if things[':knife:'] > 0:
