@@ -277,7 +277,7 @@ class Ekonomika(commands.Cog):
             else:
                 await ctx.send('Nemáš dost <:TACoin:806882594519515146> na tuto platbu xd. Poor')
 
-    @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře]')
+    @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře] (počet-nepovinný)')
     async def sell(self, ctx, item, count=None):
         user = ctx.author
         server = ctx.guild
