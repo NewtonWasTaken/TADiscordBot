@@ -4,10 +4,20 @@ from google_trans_new import google_translator
 from discord.utils import get
 translator = google_translator()
 
+sprosta_slovicka = ['kurva', 'pica', 'kkt', 'kokot', 'curak', 'píča', 'kreten', 'kretene', 'kua', 'čurak', 'čurák', 'píčo', 'negr', 'píči', 'kunda', 'kundo', 'pidži', 'pičo', 'pico', 'piča']
+
 
 class Funkce(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        for i in sprosta_slovicka:
+            if i in message.content.lower():
+                await message.delete()
+                await message.author.send('Nebuď sprostý/á !!')
+
 
     @commands.command(help='Nikdy nevíš', usage='!shrug')
     async def shrug(self, ctx):
