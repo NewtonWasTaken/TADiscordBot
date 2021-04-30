@@ -325,7 +325,7 @@ class Ekonomika(commands.Cog):
                 await ctx.send('Nemáš dost místa v inventáři...')
             else:
                 choice = [0, 1]
-                choice = random.choices(choice, [40, 50])
+                choice = random.choices(choice, [60, 40])
 
                 if choice[0] == 0:
                     if ':knife:' in things:

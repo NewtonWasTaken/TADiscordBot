@@ -26,7 +26,7 @@ class NSFW(commands.Cog):
         await ctx.send(f'{random.choice(nsfw2)}')
         nsfw.close()
     @commands.command(help='Další hlášky nic nebezpečného', usage='!boob')
-    async def boob(ctx):
+    async def boob(self, ctx):
         nsfw = open('nsfw.txt', 'r', encoding='utf-8')
         nsfw2 = nsfw.read().splitlines()
         await ctx.send(f'{random.choice(nsfw2)}')
