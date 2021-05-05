@@ -3,8 +3,11 @@ import random
 from discord.ext import commands
 import requests
 import os
+import pymongo
 
-
+password = os.getenv('PASSWORD')
+mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+storage = mongo_client['TABOT']['storage']
 pp = ['8D', '8=D', '8==D', '8===D', '8====D', '8=====D', '8======D', '8=======D', '8========D']
 life = ['Žiju!', 'Nežiju!']
 distribution = [.9, .1]
@@ -24,17 +27,14 @@ class Random(commands.Cog):
 
     @commands.group(name='student', invoke_without_command=True, help='Zobrazí náhodnou hlášku studenta z naší třídy', usage='!student <add> [hláška] \nadd: nepovinný, přidá další hlášku')
     async def student(self, ctx):
-        roasty = open(os.path.dirname(__file__) + '/../roasts.txt', 'r', encoding='utf-8')
-        roasty2 = roasty.read().splitlines()
-        student = random.choice(roasty2)
+        student_storage = storage.find_one({'id': '2'})
+        student = random.choice(student_storage['student'])
         await ctx.send(student)
-        roasty.close()
 
     @student.command(name='add')
     async def student_insert(self, ctx, *, hlaska):
-        f = open(os.path.dirname(__file__) + '/../roasts.txt', 'a', encoding='utf-8')
-        s = open(os.path.dirname(__file__) + '/../roasts.txt', 'r', encoding='utf-8')
-        roasts = s.read().lower().splitlines()
+        roast_storage = storage.find_one({'id': '2'})
+        roasts = roast_storage['student']
         if hlaska.lower() in roasts:
             embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
             embed.set_thumbnail(
@@ -42,14 +42,13 @@ class Random(commands.Cog):
             embed.add_field(name="Oh no...", value="Hláška se už nachází v seznamu...", inline=False)
             await ctx.send(embed=embed)
         elif hlaska.lower() not in roasts:
-            f.write(f'\n{hlaska}')
+            roasts.append(hlaska)
+            storage.update_one({'id': '2'}, {'$set': {'student': roasts}})
             embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
             embed.add_field(name="Nice!", value=f"Hláška: '{hlaska}' byla přidána do seznamu!", inline=False)
             await ctx.send(embed=embed)
-        f.close()
-        s.close()
 
     @commands.command(help='Testovací zpráva jestli bot žije', usage='!status')
     async def status(self, ctx):
@@ -89,16 +88,14 @@ class Random(commands.Cog):
 
     @commands.group(name='ucitel', invoke_without_command=True, help='Ukáže náhodnou hlášku učitele.', usage='!ucitel <add> (hláška) \nadd: nepovinný, přidá další hlášku')
     async def ucitel(self, ctx):
-        ucitel = open(os.path.dirname(__file__) + '/../ucitel.txt', 'r', encoding='utf-8')
-        ucitel2 = ucitel.read().splitlines()
-        await ctx.send(f'{random.choice(ucitel2)}')
-        ucitel.close()
+        ucitel_storage = storage.find_one({'id': '3'})
+        ucitel = ucitel_storage['ucitel']
+        await ctx.send(random.choice(ucitel))
 
     @ucitel.command(name='add')
     async def ucitel_insert(self, ctx, *, hlaska):
-        f = open(os.path.dirname(__file__) + '/../ucitel.txt', 'a', encoding='utf-8')
-        s = open(os.path.dirname(__file__) + '/../ucitel.txt', 'r', encoding='utf-8')
-        roasts = s.read().lower().splitlines()
+        roasts_storage = storage.find_one({'id': '3'})
+        roasts = roasts_storage['ucitel']
         if hlaska.lower() in roasts:
             embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
             embed.set_thumbnail(
@@ -106,13 +103,12 @@ class Random(commands.Cog):
             embed.add_field(name="Oh no...", value="Hláška se už nachází v seznamu...", inline=False)
             await ctx.send(embed=embed)
         elif hlaska.lower() not in roasts:
-            f.write(f'\n{hlaska}')
+            roasts.append(hlaska)
+            storage.update_one({'id': '3'}, {'$set': {'ucitel': roasts}})
             embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
             embed.add_field(name="Nice!", value=f"Hláška: '{hlaska}' byla přidána do seznamu!", inline=False)
             await ctx.send(embed=embed)
-        f.close()
-        s.close()
 def setup(client):
     client.add_cog(Random(client))

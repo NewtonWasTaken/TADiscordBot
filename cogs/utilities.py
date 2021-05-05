@@ -1,7 +1,13 @@
+import os
+
 import discord
+import pymongo
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
-import time
+from discord.ext.commands import has_permissions
+
+password = os.getenv('PASSWORD')
+mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+storage = mongo_client['TABOT']['storage']
 
 class Utilities(commands.Cog):
     def __init__(self, client):
@@ -10,24 +16,21 @@ class Utilities(commands.Cog):
     @commands.command(name='blacklist', help='Blacklistne song pro play command. Potřebuješ oprávnění Spravovat role.', usage='!blacklist [id_songu_youtube]')
     @has_permissions(manage_roles=True)
     async def _blacklist(self, ctx, id):
-        f = open('blacklist.txt', 'a', encoding='utf-8')
-        s = open('blacklist.txt', 'r', encoding='utf-8')
-        blacklist = s.read().lower().splitlines()
-        if id in blacklist:
+        blacklist = storage.find_one({'id': '1'})
+        if id in blacklist['links']:
             embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
             embed.set_thumbnail(
                 url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
             embed.add_field(name="Oh no...", value="ID už je blacklistnuté", inline=False)
             await ctx.send(embed=embed)
-        elif id not in blacklist:
-            f.write(f'\n{id}')
+        elif id not in blacklist['links']:
+            blacklist['links'].append(id)
+            storage.update_one({'id': '1'}, {'$set': {'links': blacklist['links']}})
             embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
             embed.add_field(name="Nice!", value=f"ID: {id} bylo blacklistnuto!", inline=False)
             await ctx.send(embed=embed)
-        f.close()
-        s.close()
     @commands.command(help='Kickne uživatele ze serveru, Potřebuješ oprávnění Vyhodit člena.', usage='!kick [uživatel] (důvod-nepovinný)')
     @has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason='žádný reason'):

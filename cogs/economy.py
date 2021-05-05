@@ -19,7 +19,7 @@ animals = mongo_client['TABOT']['animals']
 hunt_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', '<:kalda:829322764065701889>']
 sell_list = [':mouse:', ':hamster:', ':bear:', ':knife:', ':mammoth:', ':bird:', ':kangaroo:', ':monkey:', ':rabbit2:', ':unicorn:', ':archery:', ':spoon:', '<:kalda:829322764065701889>']
 price_list = [50, 75, 150, 4000, 200, 500, 250, 200, 600, 5000, 17000, 45000, 0]
-fail_text = ['Našel jsi :teddy_bear: hodil jsi ho do popelnice...', 'Našel jsi dva dny staré :newspaper2:, jediný co ses dozvěděl je že zase prodloužili lockdown...', 'Našel jsi :knot: Myslím že ti bude k ničemu...','Našel jsi :knife:, ale byl plastovej xd', 'Našel jsi :french_bread:, a snědl jsi ji, takže teď už nemáš nic :)','Našel jsi :bread:, a snědl jsi ho, takže teď už nemáš nic :)', 'Našel jsi :knot:, takže se konečně můžeš oběsit...']
+fail_text = ['Našel jsi :teddy_bear: hodil jsi ho do popelnice...', 'Našel jsi dva dny staré :newspaper2:, jediný co ses dozvěděl že ', 'Našel jsi :knot: Myslím že ti bude k ničemu...','Našel jsi :knife:, ale byl plastovej xd', 'Našel jsi :french_bread:, a snědl jsi ji, takže teď už nemáš nic :)','Našel jsi :bread:, a snědl jsi ho, takže teď už nemáš nic :)', 'Našel jsi :knot:, takže se konečně můžeš oběsit...']
 
 requests.packages.urllib3.disable_warnings()
 translator = google_translator()
@@ -362,7 +362,12 @@ class Ekonomika(commands.Cog):
                         await ctx.send(f'Chytil jsi {catch[0]} Tvůj první kousek <:poggers:824280503590322277>')
                 elif choice[0] == 1:
                     catch = random.choices(fail_text)
-                    await ctx.send(catch[0])
+                    if catch[0] == 'Našel jsi dva dny staré :newspaper2:, jediný co ses dozvěděl že ':
+                        f = requests.get('https://newsapi.org/v2/top-headlines?country=cz&apiKey={}'.format(os.getenv('NEWS_TOKEN')))
+                        news = f.json()
+                        await ctx.send(catch[0] + news['articles'][random.choice(range(0, len(news['articles'])))]['title'])
+                    else:
+                        await ctx.send(catch[0])
         elif start == False:
             minutes = pending / 60
             await ctx.send(f'Znova můžeš použít příkaz za **{int(minutes)} minut** a **{int(pending % 60)} vteřin**')
@@ -439,11 +444,14 @@ async def capacity_check(user, server):
 
 async def coin_add(user, server, time_clock, time_wait):
     stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
-    if time.time() - stats[time_clock] >= time_wait:
-        inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {time_clock: time.time()}})
-        return (True)
-    elif time.time() - stats[time_clock] < time_wait:
-        return (False)
+    if stats['server'] == '806808047509831700':
+        return(True)
+    else:
+        if time.time() - stats[time_clock] >= time_wait:
+            inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {time_clock: time.time()}})
+            return (True)
+        elif time.time() - stats[time_clock] < time_wait:
+            return (False)
 
 
 def unescape(s):

@@ -2,7 +2,12 @@ import discord
 from discord.ext import commands
 import asyncio
 import youtube_dl
+import os
+import pymongo
 
+password = os.getenv('PASSWORD')
+mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+storage = mongo_client['TABOT']['storage']
 
 ydl_opts = {
             'format': 'bestaudio/best',
@@ -52,12 +57,11 @@ class Music(commands.Cog):
 
     @commands.command(help='Připojí bota k tobě na voice a přehraje skladbu. Linky pouze z youtube. Nepoužívat playlisty.', usage='!play [link]')
     async def play(self, ctx, *, url):
-        blacklist = open('blacklist.txt', 'r', encoding='utf-8')
-        blacklist2 = blacklist.read().splitlines()
         if await self.connect(ctx):
             voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
             song = self.search(url, ctx.author)
-            if song['id'] in blacklist2:
+            blacklist = storage.find_one({'id': '1'})
+            if song['id'] in blacklist['links']:
                 await ctx.send('Tenhle song je blacklistnutý, nepouštěj ho ty chuju.')
             else:
                 try:

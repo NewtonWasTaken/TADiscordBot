@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 from google_trans_new import google_translator
 from discord.utils import get
+import requests
+import os
+import random
 translator = google_translator()
 class Funkce(commands.Cog):
     def __init__(self, client):
@@ -96,7 +99,9 @@ class Funkce(commands.Cog):
                 await ctx.send('Tenhle command neexistuje')
 
     @commands.command()
-    async def message(self, ctx, *, message):
-        await ctx.send(message)
+    async def news(self, ctx):
+        f = requests.get('https://newsapi.org/v2/top-headlines?country=cz&apiKey={}'.format(os.getenv('NEWS_TOKEN')))
+        news = f.json()
+        await ctx.send(news['articles'][random.choice(range(0, len(news['articles'])))]['title'])
 def setup(client):
     client.add_cog(Funkce(client))
