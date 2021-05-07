@@ -36,7 +36,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         await ctx.send('Command nenalezen')
         pass
-    else:
+    if isinstance(error, commands.BadArgument):
         command = ctx.command.qualified_name
         help = client.get_command(command).help
         usage = client.get_command(command).usage
@@ -49,6 +49,8 @@ async def on_command_error(ctx, error):
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
         await ctx.send(embed=embed)
+    else:
+
         print(error)
 
 
