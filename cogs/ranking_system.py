@@ -47,14 +47,51 @@ class Ranking(commands.Cog):
             exp2 = exp - finish2
             boxes = finish3 / 10
             boxes1 = exp2 / boxes
+
+            list = []
+            id = []
+            l = 1
+            for i in users.find({'server': str(ctx.guild.id)}):
+                list.append(i)
+            list.sort(reverse=True, key=sort_func)
+            for i in list:
+                id.append(i['id'])
+
+
+
             embed = discord.Embed(title="Rank", description="Jméno člena: {}".format(member.mention), color=0x084be7)
             embed.add_field(name="XP:", value=f'{exp} / {int(finish)} XP', inline=True)
             embed.add_field(name="Level:", value=lvl, inline=True)
+            embed.add_field(name="Rank:", value=f'# {int(id.index(str(member.id)) + 1)}', inline=True)
             embed.add_field(name=f"{lvl}                                                                {lvl_end}",
                             value=int(boxes1) * ' :blue_square: ' + (10 - int(boxes1)) * ' :white_large_square: ',
                             inline=False)
             embed.set_thumbnail(url=member.avatar_url)
             await ctx.send(embed=embed)
+
+    @commands.command(help='Ukáže tabulku podle xp na serveru.', usage='!leaderboard')
+    async def leaderboard(self, ctx):
+        list = []
+        id = []
+        xp = []
+        l=1
+        rank = []
+        for i in users.find({'server': str(ctx.guild.id)}):
+            list.append(i)
+        list.sort(reverse=True, key=sort_func)
+        for i in list:
+            id.append(i['id'])
+            xp.append(i['xp'])
+            rank.append(l)
+            l+=1
+        embed = discord.Embed(title='Leaderboard',description='Tady vidíš kolikáty jsi v počtu odeslaných zpráv, za každou zprávu je 20xp:', color=0x1926e1)
+        embed.add_field(name='Tabulka' ,value="\n".join("{}. - <@{}> - {} XP".format(x, y, z) for x, y, z in zip(rank,id, xp) ), inline=False)
+        embed.set_thumbnail(url=
+                            'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+        await ctx.send(embed=embed)
+
+
+
 
 
     def update_data(self, user, server):
@@ -89,5 +126,7 @@ class Ranking(commands.Cog):
 
 def setup(client):
     client.add_cog(Ranking(client))
+def sort_func(e):
+        return e['xp']
 
 
