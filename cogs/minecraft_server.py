@@ -21,7 +21,7 @@ class Minecraft(commands.Cog):
             embed = discord.Embed(title="Server je offline!", color=0xff0000)
             embed.set_author(name="Minecraft Server Tercie A")
             embed.set_thumbnail(
-                url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                url=self.client.user.avatar_url)
             embed.add_field(name="Připoj se na server a do chatu napiš:",
                             value="/join TercieA, pak se odpoj a počkej až se server zapne", inline=False)
             embed.set_footer(text="IP adresa serveru: TercieA.minehut.gg")
@@ -30,7 +30,7 @@ class Minecraft(commands.Cog):
             embed = discord.Embed(title="Server je online!", color=0x1fd312)
             embed.set_author(name="Minecraft Server Tercie A")
             embed.set_thumbnail(
-                url='https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+                url=self.client.user.avatar_url)
             embed.add_field(name="Počet lidí na serveru:",
                             value=f'{count} z {maxplayers} \n' + count * ' :blue_square: ' + (
                                         10 - count) * ' :white_large_square: ', inline=False)

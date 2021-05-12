@@ -26,7 +26,7 @@ async def on_command_error(ctx, error):
                               color=0xff0000)
         embed.set_author(name="TA Discord Bot")
         embed.set_thumbnail(
-            url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+            url=client.user.avatar_url)
         embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
@@ -44,7 +44,7 @@ async def on_command_error(ctx, error):
                               color=0xff0000)
         embed.set_author(name="TA Discord Bot")
         embed.set_thumbnail(
-            url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+            url=client.user.avatar_url)
         embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
