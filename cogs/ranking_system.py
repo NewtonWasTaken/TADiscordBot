@@ -87,7 +87,7 @@ class Ranking(commands.Cog):
         embed = discord.Embed(title='Leaderboard',description='Tady vidíš kolikáty jsi v počtu odeslaných zpráv, za každou zprávu je 20xp:', color=0x1926e1)
         embed.add_field(name='Tabulka' ,value="\n".join("{}. - <@{}> - {} XP".format(x, y, z) for x, y, z in zip(rank,id, xp) ), inline=False)
         embed.set_thumbnail(url=
-                            'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+                            self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
 

@@ -54,14 +54,14 @@ class Ekonomika(commands.Cog):
        embed.add_field(name="Peníze", value=f"{coins} <:TACoin:806882594519515146>", inline=True)
        embed.add_field(name=f'Věci {capacity} / {my_capacity} <:otrok:824609734778421258>' , value= "\n".join("{} × {}".format(x, y) for x, y in zip(number, thing_list)) , inline=False)
        embed.set_thumbnail(url=
-       'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+       self.client.user.avatar_url)
        await ctx.send(embed=embed)
       except:
        embed=discord.Embed(title="Inventář", description="Toto je seznam věcí které máš:", color=0x1926e1)
        embed.set_author(name=user.name, icon_url= user.avatar_url)
        embed.add_field(name="Peníze", value=f"{coins} <:TACoin:806882594519515146>", inline=True)
        embed.add_field(name="Věci 0/25 <:otrok:824609734778421258>", value= 'Kde nic tu nic...' , inline=False)
-       embed.set_thumbnail(url= 'https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+       embed.set_thumbnail(url= self.client.user.avatar_url)
        await ctx.send(embed=embed)
 
     @commands.command(help='Kvíz o 100 TA Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá zprávou s obsahem 1-4', usage='!kviz <cz> \ncz: nepovinný, kvíz bude přeložen do češtiny')
@@ -98,7 +98,7 @@ class Ekonomika(commands.Cog):
                 random.shuffle(answers)
                 embed = discord.Embed(title=category, color=0x378ad7)
                 embed.set_thumbnail(
-                    url="https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                    url=self.client.user.avatar_url)
                 embed.add_field(name=question,
                                 value=f"[1] {answers[0]} \n [2] {answers[1]} \n [3] {answers[2]} \n [4] {answers[3]}",
                                 inline=True)
@@ -140,7 +140,7 @@ class Ekonomika(commands.Cog):
                 random.shuffle(answers)
                 embed = discord.Embed(title=en_category, color=0x378ad7)
                 embed.set_thumbnail(
-                    url="https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                    url=self.client.user.avatar_url)
                 embed.add_field(name=en_question,
                                 value=f"[1] {answers[0]} \n [2] {answers[1]} \n [3] {answers[2]} \n [4] {answers[3]}",
                                 inline=True)
@@ -173,7 +173,7 @@ class Ekonomika(commands.Cog):
         embed = discord.Embed(title='Shop', description='Tady si můžeš kupovat různé věci :', color=0x0b49da)
         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(
-            url='https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png')
+            url=self.client.user.avatar_url)
         embed.add_field(name='[1] :knife: / 5000 <:TACoin:806882594519515146>',
                         value='Knife ti může i padnout. Zvyšuje šance na základní zvířata. S :knife: můžeš naviíc chytit :mammoth: :kangaroo: a :monkey:',
                         inline=False)
@@ -399,7 +399,7 @@ class Ekonomika(commands.Cog):
         embed = discord.Embed(title="Ceny", description="Tady vidíte za kolik můžete co prodat!", color=0x0b12ea)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(
-            url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+            url=self.client.user.avatar_url)
         embed.add_field(name="Věci:", value='\n'.join(
             "{} / {} <:TACoin:806882594519515146>".format(x, y) for x, y in zip(sell_list, price_list)), inline=False)
         await ctx.send(embed=embed)

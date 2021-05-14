@@ -20,7 +20,7 @@ class Utilities(commands.Cog):
         if id in blacklist['links']:
             embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
             embed.set_thumbnail(
-                url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                url=self.client.user.avatar_url)
             embed.add_field(name="Oh no...", value="ID už je blacklistnuté", inline=False)
             await ctx.send(embed=embed)
         elif id not in blacklist['links']:
@@ -28,7 +28,7 @@ class Utilities(commands.Cog):
             storage.update_one({'id': '1'}, {'$set': {'links': blacklist['links']}})
             embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
             embed.set_thumbnail(
-                url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                url=self.client.user.avatar_url)
             embed.add_field(name="Nice!", value=f"ID: {id} bylo blacklistnuto!", inline=False)
             await ctx.send(embed=embed)
     @commands.command(help='Kickne uživatele ze serveru, Potřebuješ oprávnění Vyhodit člena.', usage='!kick [uživatel] (důvod-nepovinný)')

@@ -75,7 +75,7 @@ class Music(commands.Cog):
                     voice.is_playing()
                     embed = discord.Embed(title="Hudba", color=0x1927e6)
                     embed.set_thumbnail(
-                        url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                        url=self.client.user.avatar_url)
                     embed.add_field(name="Právě hraje",
                                     value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})",
                                     inline=False)
@@ -85,7 +85,7 @@ class Music(commands.Cog):
                 else:
                     embed = discord.Embed(title="Hudba", color=0x1927e6)
                     embed.set_thumbnail(
-                        url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                        url=self.client.user.avatar_url)
                     embed.add_field(name="Přidáno do řady", value=f"[{song['title']}]({song['link']})", inline=False)
                     embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
                     await ctx.send(embed=embed)
@@ -148,7 +148,7 @@ class Music(commands.Cog):
             voice.is_playing()
             embed = discord.Embed(title="Hudba", color=0x1927e6)
             embed.set_thumbnail(
-                url="https://images-ext-1.discordapp.net/external/tNcvSCRmdnuc2UTxzxUxvEEamscNLhps_JwSL4_nq4o/https/images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%25253Fsize%25253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                url=self.client.user.avatar_url)
             embed.add_field(name="Právě hraje",
                             value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})",
                             inline=False)

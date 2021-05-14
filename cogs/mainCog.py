@@ -42,7 +42,7 @@ class Funkce(commands.Cog):
             "Tohoto bota vytvořil: <@551426822299189259> . ",
             color=0x14db3c)
         embed.set_thumbnail(
-            url="https://images-ext-1.discordapp.net/external/SMPyCghYQ5glv-QvS8SI3hzsUOwP1As2mTpo6EbNI6Y/https/images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%253Fsize%253D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+            url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command(help='Přeloží zadaný text z EN do CZ', usage='!translate [text]')
@@ -60,7 +60,7 @@ class Funkce(commands.Cog):
                 embed = discord.Embed(title=f"Help !{command}", description=f"Tady je help pro command {command}:", color=0xff0000)
                 embed.set_author(name="TA Discord Bot")
                 embed.set_thumbnail(
-                    url="https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png")
+                    url=self.client.user.avatar_url)
                 embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
                 embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
                 embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
@@ -74,7 +74,7 @@ class Funkce(commands.Cog):
                 embed.set_author(name="TA Discord Bot")
                 embed.set_thumbnail(
                     url=
-                    "https://images-ext-2.discordapp.net/external/fk_Rt54KghVZzB6f4zULyh3zwfwejIFC8YrTSm0n93U/%3Fsize%3D1024/https/cdn.discordapp.com/icons/693009303526703134/97eaa6054b8ca49e7dcc44e2fc725792.png"
+                    self.client.user.avatar_url
                 )
                 embed.add_field(name="Funkce :gear: ", value="`ping` `pong` `status` `mute` `unmute` `clear` `kick` `ban` `blacklist`", inline=False)
                 embed.add_field(name="Vlastní commandy <:TACoin:806882594519515146> ",
