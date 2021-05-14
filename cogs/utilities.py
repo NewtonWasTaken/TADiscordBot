@@ -43,7 +43,6 @@ class Utilities(commands.Cog):
         role = discord.utils.find(lambda r: r.name == 'Muted', ctx.guild.roles)
         if role not in member.roles:
             await member.add_roles(role)
-            await member.edit(mute=True)
             await ctx.send(f'Uživatel {member.mention} byl mutnut. Reason: {reason}')
         else:
             await ctx.send(f'Uživatel {member.mention} už je mutnut')
@@ -57,7 +56,6 @@ class Utilities(commands.Cog):
             await ctx.send(f'Uživatel {member.mention} není mutnut')
         else:
             await member.remove_roles(role)
-            await member.edit(mute=False)
             await ctx.send(f'Uživatel {member.mention} byl odmutnut.')
     @commands.command(help='Zabanuje daného člověka. Potřebuješ Oprávnění Zabanovat člena.', usage='!ban [uživatel] [reason]')
     @has_permissions(ban_members=True)
