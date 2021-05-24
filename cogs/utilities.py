@@ -1,8 +1,8 @@
 import os
-
+import requests
 import discord
 import pymongo
-from discord.ext import commands
+from discord.ext import tasks, commands
 from discord.ext.commands import has_permissions
 
 password = os.getenv('PASSWORD')
@@ -12,6 +12,7 @@ storage = mongo_client['TABOT']['storage']
 class Utilities(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.elo.start()
 
     @commands.command(name='blacklist', help='Blacklistne song pro play command. Potřebuješ oprávnění Spravovat role.', usage='!blacklist [id_songu_youtube]')
     @has_permissions(manage_roles=True)
@@ -68,6 +69,19 @@ class Utilities(commands.Cog):
     async def clear(self, ctx, count):
         await ctx.channel.purge(limit=int(count))
         await ctx.send(f'Smazáno {count} zpráv :white_check_mark:')
+
+    @tasks.loop(seconds=10.0)
+    async def elo(self):
+        await self.client.wait_until_ready()
+        elo = storage.find_one({'id': '4'})
+        f = requests.get('https://lichess.org/api/user/Vyvar123')
+        data = f.json()
+        if str(elo['elo']) != str(data['perfs']['rapid']['rating']):
+            guild = self.client.get_guild(693009303526703134)
+            role = discord.utils.get(guild.roles, name=f"{elo['elo']} elo v šachách = pjethed")
+            await role.edit(name=f"{data['perfs']['rapid']['rating']} elo v šachách = pjethed")
+            storage.update_one({'id': '4'}, {'$set':{'elo': str(data['perfs']['rapid']['rating'])}})
+
 
 def setup(client):
     client.add_cog(Utilities(client))
