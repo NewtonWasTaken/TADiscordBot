@@ -70,7 +70,7 @@ class Utilities(commands.Cog):
         await ctx.channel.purge(limit=int(count))
         await ctx.send(f'Smazáno {count} zpráv :white_check_mark:')
 
-    @tasks.loop(seconds=10.0)
+    @tasks.loop(seconds=300.0)
     async def elo(self):
         await self.client.wait_until_ready()
         elo = storage.find_one({'id': '4'})
