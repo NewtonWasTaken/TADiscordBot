@@ -17,3 +17,4 @@ gevent
 ffmpeg
 pynacl
 youtube_dl
+discord-components

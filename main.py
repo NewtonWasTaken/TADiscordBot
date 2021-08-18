@@ -1,10 +1,10 @@
 import discord
 import os
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
+from discord.ext.commands import has_permissions, MissingPermissions, Bot
 from kahoot import client
 import requests
-
+from discord_components import DiscordComponents, Button, Select, SelectOption
 
 
 requests.packages.urllib3.disable_warnings()
@@ -16,6 +16,7 @@ client.remove_command('help')
 async def on_ready():
     print('Connected to {0.user}'.format(client))
     await client.change_presence(activity= discord.Game(name='Cvičí posilko s Vaňkem | !help'))
+    DiscordComponents(client)
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -53,8 +54,11 @@ async def on_command_error(ctx, error):
 
         print(error)
 
-
-
+@client.command()
+async def button(ctx):
+    await ctx.send('Ahoj', components = [Button(label = 'Pog', custom_id = 'button1', style= 4)])
+    message = await client.wait_for("button_click", check=lambda i: i.custom_id == "button1")
+    await message.send(content= "Button clicked!")
 
 
 client.load_extension('cogs.kahoot')

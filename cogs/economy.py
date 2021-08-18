@@ -9,6 +9,7 @@ import requests
 import asyncio
 from google_trans_new import google_translator
 import pymongo
+from discord_components import DiscordComponents, Button, Select, SelectOption
 
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
@@ -64,7 +65,7 @@ class Ekonomika(commands.Cog):
        embed.set_thumbnail(url= self.client.user.avatar_url)
        await ctx.send(embed=embed)
 
-    @commands.command(help='Kvíz o 100 TA Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá zprávou s obsahem 1-4', usage='!kviz <cz> \ncz: nepovinný, kvíz bude přeložen do češtiny')
+    @commands.command(help='Kvíz o 100 TA Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá tlačítky s obsahem 1-4', usage='!kviz')
     async def kviz(self, ctx, language=None):
         if language == None:
             language = 'en'
@@ -76,6 +77,8 @@ class Ekonomika(commands.Cog):
         pending = 300 - (time.time() - stats['time2'])
         if start == True:
             if language == 'cz':
+                await ctx.send('Jazyk čeština je dočasně nedostupný!')
+                '''
                 f = requests.get('https://opentdb.com/api.php?amount=1&difficulty=medium&type=multiple')
                 f = f.text
                 f = unescape(f)
@@ -123,7 +126,8 @@ class Ekonomika(commands.Cog):
                         await ctx.send(f'Špatná odpověď, nic jsi nedostal... Správná odpověď byla **{correct}**')
                 except asyncio.TimeoutError:
                     await ctx.send(f'Nestihl jsi odpovědět, nic jsi nedostal... Správná odpověď byla **{correct}**')
-            elif language == 'en':
+                    '''
+            if language == 'en':
                 f = requests.get('https://opentdb.com/api.php?amount=1&difficulty=medium&type=multiple')
                 f = f.text
                 f = unescape(f)
@@ -144,25 +148,27 @@ class Ekonomika(commands.Cog):
                 embed.add_field(name=en_question,
                                 value=f"[1] {answers[0]} \n [2] {answers[1]} \n [3] {answers[2]} \n [4] {answers[3]}",
                                 inline=True)
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, components = [[Button(label = '1', custom_id = 'button1', style= 1), Button(label = '2', custom_id = 'button2', style= 1), Button(label = '3', custom_id = 'button3', style= 1), Button(label = '4', custom_id = 'button4', style= 1)]])
                 for i in answers:
                     if i == correct:
                         number = x
                         break
                     x = x + 1
-
+                print(number)
                 def check2(m):
-                    return m.author == ctx.author and m.content.isdigit()
+                    return m.user == ctx.author
 
                 try:
-                    msg = await self.client.wait_for('message', timeout=10.0, check=check2)
-                    if msg.content == str(number):
-                        await ctx.send('Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>')
+                    instance = await self.client.wait_for('button_click', timeout=10.0, check=check2)
+                    if instance.component.label == str(number):
+                        await instance.respond(type=4, content="Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>", ephemeral=False)
                         result = stats['money'] + 100
                         inventory.update_one({'id': str(user.id), 'server': str(server.id)},
                                              {'$set': {'money': result}})
                     else:
-                        await ctx.send(f'Špatná odpověď, nic jsi nedostal... Správná odpověď byla **{correct}**')
+                        await instance.respond(type=4,
+                                               content=f'Špatná odpověď, nic jsi nedostal...Správná odpověď byla **{correct}**',
+                                               ephemeral=False)
                 except asyncio.TimeoutError:
                     await ctx.send(f'Nestihl jsi odpovědět, nic jsi nedostal...Správná odpověď byla **{correct}**')
         elif start == False:
@@ -188,72 +194,36 @@ class Ekonomika(commands.Cog):
         embed.add_field(name='[5]  ⭐SWAG/ 20 000 <:TACoin:806882594519515146>',
                         value='Kup si roli ⭐SWAG, budeš výše v tabu a můžeš měnit přezdívky!!', inline=False)
         embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí !buy *čislo předmětu*')
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, components = [
+            Select(
+                placeholder = "Vyber si co si chceš koupit.",
+                options = [
+                    SelectOption(label = "/ 5000 TA coinů", value = "1", emoji= '🔪'),
+                    SelectOption(label = "/ 20 000 TA coinů", value = "2", emoji= '🏹'),
+                    SelectOption(label="/ 50 000 TA coinů", value="3", emoji= '🥄'),
+                    SelectOption(label=" / 15 000 TA coinů", value="4", emoji=discord.PartialEmoji(name='otrok', id='824609734778421258')),
+                    SelectOption(label="SWAG/ 20 000 TA coinů", value="5", emoji= '⭐')
+                ]
+            )
+        ])
+        def check(m):
+            return m.user == ctx.author
 
-    @commands.command(pass_context=True, help='Zakoupení předmětu.', usage='!buy [číslo předmětu]')
-    async def buy(self, ctx, number_buy):
-        user = ctx.author
-        server = ctx.guild
-        await coin_update(user, server)
-        stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
-        capacity = await capacity_check(user, server)
-        my_capacity = stats['capacity']
-        if capacity >= my_capacity:
-            await ctx.send('Nemáš místo v inventáři...')
+        shop = {'1': '🔪', '2': '🏹', '3': '🥄', '4': '<:otrok:824609734778421258>', '5': '⭐'}
+        instance= await self.client.wait_for('select_option', check=check)
+        await instance.send(f'Opravdu chceš koupit {shop[instance.values[0]]} ?', components = [[Button(label = 'Potvrdit', custom_id = 'button1'), Button(label = 'Zrušit', custom_id = 'button2')]])
+        instance2 = await self.client.wait_for('button_click', check=check)
+        if instance2.custom_id == 'button1':
+            await buy(ctx, instance.values[0], instance2)
         else:
-            if number_buy == '1':
-                try_number = stats['money'] - 5000
-                if try_number >= 0:
-                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
-                                         {'$set': {'money': try_number}})
-                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':knife:': 1}})
-                    await ctx.send('Koupil sis :knife:')
-                else:
-                    await ctx.send('Nemáš dostatek peněz na :knife:')
-            if number_buy == '2':
-                try_number = stats['money'] - 20000
-                if try_number >= 0:
-                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
-                                         {'$set': {'money': try_number}})
-                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':archery:': 1}})
-                    await ctx.send('Koupil sis :archery:')
-                else:
-                    await ctx.send('Nemáš dostatek peněz na :archery:')
-            if number_buy == '3':
-                try_number = stats['money'] - 50000
-                if try_number >= 0:
-                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
-                                         {'$set': {'money': try_number}})
-                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':spoon:': 1}})
-                    await ctx.send('Koupil sis :spoon:')
-                else:
-                    await ctx.send('Nemáš dostatek peněz na :spoon:')
-            if number_buy == '4':
-                try_number = stats['money'] - 15000
-                if try_number >= 0:
-                    result = stats['capacity'] + 50
-                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
-                                         {'$set': {'money': try_number}})
-                    inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {'capacity': result}})
-                    await ctx.send('Koupil sis <:otrok:824609734778421258>')
-                else:
-                    await ctx.send('Nemáš dostatek peněz na <:otrok:824609734778421258>')
-            if number_buy == '5':
-                try_number = stats['money'] - 20000
-                if try_number >= 0:
-                    role = discord.utils.find(lambda r: r.name == '⭐SWAG', ctx.guild.roles)
-                    role2 = discord.utils.find(lambda r: r.name == 'Aby Byl Dlaba Spokojen', ctx.guild.roles)
-                    if role not in ctx.author.roles:
-                        inventory.update_one({'id': str(user.id), 'server': str(server.id)},
-                                             {'$set': {'money': try_number}})
+            await ctx.send('Zrušeno')
 
-                        await ctx.author.add_roles(role)
-                        await ctx.author.add_roles(role2)
-                        await ctx.send('Koupil sis ⭐SWAG')
-                    else:
-                        await ctx.send('Roli ⭐SWAG už máš!')
-                else:
-                    await ctx.send('Nemáš dostatek peněz na roli ⭐SWAG')
+
+
+
+#<:otrok:824609734778421258>
+
+
 
     @commands.command(help='Pošle danému člověku daný počet TA Coinů', usage='!send [peníze] [uživatel]')
     async def send(self, ctx, money=None, member: discord.Member = None):
@@ -470,3 +440,90 @@ async def coin_add_24(user, server, money):
     return(True)
   else:
     return(False)
+async def buy(ctx, number_buy, instance):
+        user = ctx.author
+        server = ctx.guild
+        await coin_update(user, server)
+        stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+        capacity = await capacity_check(user, server)
+        my_capacity = stats['capacity']
+        if capacity >= my_capacity:
+            await instance.respond(type=4,
+                                   content=f'Nemáš místo v inventáři...',
+                                   ephemeral=False)
+        else:
+            if number_buy == '1':
+                try_number = stats['money'] - 5000
+                if try_number >= 0:
+                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
+                                         {'$set': {'money': try_number}})
+                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':knife:': 1}})
+                    await instance.respond(type=4,
+                                           content=f'Koupil sis :knife:',
+                                           ephemeral=False)
+                else:
+                    await instance.respond(type=4,
+                                           content=f'Nemáš dostatek peněz na :knife:',
+                                           ephemeral=False)
+            if number_buy == '2':
+                try_number = stats['money'] - 20000
+                if try_number >= 0:
+                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
+                                         {'$set': {'money': try_number}})
+                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':archery:': 1}})
+                    await instance.respond(type=4,
+                                           content=f'Koupil sis :archery:',
+                                           ephemeral=False)
+                else:
+                    await instance.respond(type=4,
+                                           content=f'Nemáš dostatek peněz na :archery:',
+                                           ephemeral=False)
+            if number_buy == '3':
+                try_number = stats['money'] - 50000
+                if try_number >= 0:
+                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
+                                         {'$set': {'money': try_number}})
+                    animals.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {':spoon:': 1}})
+                    await instance.respond(type=4,
+                                           content=f'Koupil sis :spoon:',
+                                           ephemeral=False)
+                else:
+                    await instance.respond(type=4,
+                                           content=f'Nemáš dostatek peněz na :spoon:',
+                                           ephemeral=False)
+            if number_buy == '4':
+                try_number = stats['money'] - 15000
+                if try_number >= 0:
+                    result = stats['capacity'] + 50
+                    inventory.update_one({'id': str(user.id), 'server': str(server.id)},
+                                         {'$set': {'money': try_number}})
+                    inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {'capacity': result}})
+                    await instance.respond(type=4,
+                                           content=f'Koupil sis <:otrok:824609734778421258>',
+                                           ephemeral=False)
+                else:
+                    await instance.respond(type=4,
+                                           content=f'Nemáš dostatek peněz na <:otrok:824609734778421258>',
+                                           ephemeral=False)
+            if number_buy == '5':
+                try_number = stats['money'] - 20000
+                if try_number >= 0:
+                    role = discord.utils.find(lambda r: r.name == '⭐SWAG', ctx.guild.roles)
+                    role2 = discord.utils.find(lambda r: r.name == 'Aby Byl Dlaba Spokojen', ctx.guild.roles)
+                    if role not in ctx.author.roles:
+                        inventory.update_one({'id': str(user.id), 'server': str(server.id)},
+                                             {'$set': {'money': try_number}})
+
+                        await ctx.author.add_roles(role)
+                        await ctx.author.add_roles(role2)
+                        await instance.respond(type=4,
+                                               content=f'Koupil sis ⭐SWAG',
+                                               ephemeral=False)
+                    else:
+                        await instance.respond(type=4,
+                                               content=f'Roli ⭐SWAG už máš!',
+                                               ephemeral=False)
+                else:
+                    await instance.respond(type=4,
+                                           content=f'Nemáš dostatek peněz na roli ⭐SWAG',
+                                           ephemeral=False)

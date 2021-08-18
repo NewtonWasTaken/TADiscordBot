@@ -89,7 +89,7 @@ class Funkce(commands.Cog):
                 embed.add_field(name="Rank systém :chart_with_upwards_trend: ", value="`rank` `leaderboard`", inline=False)
                 embed.add_field(name="Minecraft server :tent: ", value="`server` `server` ", inline=False)
                 embed.add_field(name="Ekonomika <:TACoin:806882594519515146> ",
-                                value="`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `kviz cz` `sell` `buy` `prices` ",
+                                value="`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `sell` `prices` ",
                                 inline=False)
                 embed.add_field(name="Hudba :notes: ", value="`join` `leave` `play` `skip` `pause` `resume`",
                                 inline=False)
