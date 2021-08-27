@@ -59,17 +59,8 @@ class Music(commands.Cog):
     async def play(self, ctx, *, url):
         if await self.connect(ctx):
             voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
-            song = self.search(url, ctx.author)
-            blacklist = storage.find_one({'id': '1'})
-            if song['id'] in blacklist['links']:
-                await ctx.send('Tenhle song je blacklistnutý, nepouštěj ho ty chuju.')
-            else:
-                try:
-                    song_queue[str(ctx.guild.id)].append(song)
-                except:
-                    song_queue[str(ctx.guild.id)] = []
-                    song_queue[str(ctx.guild.id)].append(song)
-                if not voice.is_playing():
+            self.search(url, ctx.author, ctx.guild)
+            if not voice.is_playing():
                     voice.play(discord.FFmpegPCMAudio(song_queue[str(ctx.guild.id)][0]['source'], **FFMPEG_OPTIONS),
                                after=lambda e: self.play_next(ctx))
                     voice.is_playing()
@@ -82,12 +73,12 @@ class Music(commands.Cog):
                     embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][0]['user'].mention}",
                                     inline=False)
                     await ctx.send(embed=embed)
-                else:
+            else:
                     embed = discord.Embed(title="Hudba", color=0x1927e6)
                     embed.set_thumbnail(
                         url=self.client.user.avatar_url)
-                    embed.add_field(name="Přidáno do řady", value=f"[{song['title']}]({song['link']})", inline=False)
-                    embed.add_field(name=f"Song navrhl: ", value=f"{song['user'].mention}", inline=False)
+                    embed.add_field(name="Přidáno do řady", value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})", inline=False)
+                    embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][0]['user'].mention}", inline=False)
                     await ctx.send(embed=embed)
 
     @commands.command(help='Přeskočí song co právě hraje', usage='!skip')
@@ -162,11 +153,31 @@ class Music(commands.Cog):
             except:
                 asyncio.run_coroutine_threadsafe(ctx.send('Konec řady. :white_check_mark:'), self.client.loop)
 
-    def search(self, arg, user):
+    def search(self, arg, user, server):
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(arg, download=False)
-        return {'source': info['formats'][0]['url'], 'title': info['title'],
-                'link': f'https://www.youtube.com/watch?v={info["id"]}', 'user': user, 'id': info['id']}
+        try:
+            song = {'type': info['_type'], 'entries': info['entries'], 'user': user}
+        except:
+            song =  {'type': 'single', 'source': info['formats'][0]['url'], 'title': info['title'],
+            'link': f'https://www.youtube.com/watch?v={info["id"]}', 'user': user, 'id': info['id']}
+        if song['type'] == 'playlist':
+            for single in song['entries']:
+                try:
+                    song_queue[str(server.id)].append({'type': 'single', 'source': single['formats'][0]['url'], 'title': single['title'],
+            'link': f'https://www.youtube.com/watch?v={single["id"]}', 'user': user, 'id': single['id']})
+                except:
+                    song_queue[str(server.id)] = []
+                    song_queue[str(server.id)].append({'type': 'single', 'source': single['formats'][0]['url'], 'title': single['title'],
+            'link': f'https://www.youtube.com/watch?v={single["id"]}', 'user': user, 'id': single['id']})
+        else:
+            try:
+                song_queue[str(server.id)].append(song)
+            except:
+                song_queue[str(server.id)] = []
+                song_queue[str(server.id)].append(song)
+
+
 
 def setup(client):
     client.add_cog(Music(client))
