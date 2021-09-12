@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import requests
-from aternosapi import AternosAPI
 from callouts import Callouts
 
 class Minecraft(commands.Cog):
