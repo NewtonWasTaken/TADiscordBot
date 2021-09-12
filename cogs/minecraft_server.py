@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 import requests
-
+from aternosapi import AternosAPI
+from callouts import Callouts
 
 class Minecraft(commands.Cog):
     def __init__(self, client):
@@ -37,15 +38,22 @@ class Minecraft(commands.Cog):
             embed.set_footer(text="IP adresa serveru: TercieA.minehut.gg")
             await ctx.send(embed=embed)
 
-    '''
+
     @server.command(name = 'start', invoke_without_command=True)
     async def start_server_subcommand(self, ctx):
-      s = requests.post('https://api.minehut.com/users/login', data = login)
+        data = {'authorization':'d1c72c06-0375-4951-96a8-25cd008e223b', 'x-session-id':'b5c0d2be-0a9f-4c1f-95be-5994d2ee2068'}
+        s = requests.get('https://api.minehut.com/users/ghost_login', data = data)
+
+        r = requests.post('https://api.minehut.com/server/6037e2a8800860017c1f0ee0/start_service')
+        print(r.text)
+        print(s.text)
+        await ctx.send('server se zapíná i guess')
+def setup(client):
+    client.add_cog(Minecraft(client))
+
+    '''s = requests.post('https://api.minehut.com/users/login', data = login)
 
       r = requests.post('https://api.minehut.com/server/6037e2a8800860017c1f0ee0/start_service')
       await ctx.send('Server byl zapnut!')
       print(r.text)
-      print(s.text)
-    '''
-def setup(client):
-    client.add_cog(Minecraft(client))
+      print(s.text)'''

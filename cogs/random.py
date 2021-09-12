@@ -4,7 +4,7 @@ from discord.ext import commands
 import requests
 import os
 import pymongo
-
+from callouts import Callouts
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 storage = mongo_client['TABOT']['storage']
@@ -36,7 +36,7 @@ class Random(commands.Cog):
         roast_storage = storage.find_one({'id': '2'})
         roasts = roast_storage['student']
         if hlaska.lower() in roasts:
-            embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0xfc0303)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Oh no...", value="Hláška se už nachází v seznamu...", inline=False)
@@ -44,7 +44,7 @@ class Random(commands.Cog):
         elif hlaska.lower() not in roasts:
             roasts.append(hlaska)
             storage.update_one({'id': '2'}, {'$set': {'student': roasts}})
-            embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Nice!", value=f"Hláška: '{hlaska}' byla přidána do seznamu!", inline=False)
@@ -97,7 +97,7 @@ class Random(commands.Cog):
         roasts_storage = storage.find_one({'id': '3'})
         roasts = roasts_storage['ucitel']
         if hlaska.lower() in roasts:
-            embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0xfc0303)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Oh no...", value="Hláška se už nachází v seznamu...", inline=False)
@@ -105,7 +105,7 @@ class Random(commands.Cog):
         elif hlaska.lower() not in roasts:
             roasts.append(hlaska)
             storage.update_one({'id': '3'}, {'$set': {'ucitel': roasts}})
-            embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Nice!", value=f"Hláška: '{hlaska}' byla přidána do seznamu!", inline=False)

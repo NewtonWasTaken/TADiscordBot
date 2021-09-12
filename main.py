@@ -5,8 +5,7 @@ from discord.ext.commands import has_permissions, MissingPermissions, Bot
 from kahoot import client
 import requests
 from discord_components import DiscordComponents, Button, Select, SelectOption
-
-
+from callouts import Callouts
 requests.packages.urllib3.disable_warnings()
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix="!")
@@ -25,7 +24,7 @@ async def on_command_error(ctx, error):
         usage = client.get_command(command).usage
         embed = discord.Embed(title=f"Chyba", description=f"Tady je help pro command {command}:",
                               color=0xff0000)
-        embed.set_author(name="TA Discord Bot")
+        embed.set_author(name=f"{Callouts().name} Discord Bot")
         embed.set_thumbnail(
             url=client.user.avatar_url)
         embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
@@ -43,7 +42,7 @@ async def on_command_error(ctx, error):
         usage = client.get_command(command).usage
         embed = discord.Embed(title=f"Chyba", description=f"Tady je help pro command {command}:",
                               color=0xff0000)
-        embed.set_author(name="TA Discord Bot")
+        embed.set_author(name=f"{Callouts().name} Discord Bot")
         embed.set_thumbnail(
             url=client.user.avatar_url)
         embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)

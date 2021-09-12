@@ -4,7 +4,7 @@ import discord
 import pymongo
 from discord.ext import tasks, commands
 from discord.ext.commands import has_permissions
-
+from callouts import Callouts
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 storage = mongo_client['TABOT']['storage']
@@ -19,7 +19,7 @@ class Utilities(commands.Cog):
     async def _blacklist(self, ctx, id):
         blacklist = storage.find_one({'id': '1'})
         if id in blacklist['links']:
-            embed = discord.Embed(title="TA Discord bot", color=0xfc0303)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0xfc0303)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Oh no...", value="ID už je blacklistnuté", inline=False)
@@ -27,7 +27,7 @@ class Utilities(commands.Cog):
         elif id not in blacklist['links']:
             blacklist['links'].append(id)
             storage.update_one({'id': '1'}, {'$set': {'links': blacklist['links']}})
-            embed = discord.Embed(title="TA Discord bot", color=0x12e60f)
+            embed = discord.Embed(title=f"{Callouts().name} Discord bot", color=0x12e60f)
             embed.set_thumbnail(
                 url=self.client.user.avatar_url)
             embed.add_field(name="Nice!", value=f"ID: {id} bylo blacklistnuto!", inline=False)

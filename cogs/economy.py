@@ -10,7 +10,7 @@ import asyncio
 from google_trans_new import google_translator
 import pymongo
 from discord_components import DiscordComponents, Button, Select, SelectOption
-
+from callouts import Callouts
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 users = mongo_client['TABOT']['users']
@@ -52,7 +52,7 @@ class Ekonomika(commands.Cog):
       try:
        embed=discord.Embed(title="Inventář", description="Toto je seznam věcí které máš:", color=0x1926e1)
        embed.set_author(name=user.name, icon_url= user.avatar_url)
-       embed.add_field(name="Peníze", value=f"{coins} <:TACoin:806882594519515146>", inline=True)
+       embed.add_field(name="Peníze", value=f"{coins} {Callouts().emote}", inline=True)
        embed.add_field(name=f'Věci {capacity} / {my_capacity} <:otrok:824609734778421258>' , value= "\n".join("{} × {}".format(x, y) for x, y in zip(number, thing_list)) , inline=False)
        embed.set_thumbnail(url=
        self.client.user.avatar_url)
@@ -60,12 +60,12 @@ class Ekonomika(commands.Cog):
       except:
        embed=discord.Embed(title="Inventář", description="Toto je seznam věcí které máš:", color=0x1926e1)
        embed.set_author(name=user.name, icon_url= user.avatar_url)
-       embed.add_field(name="Peníze", value=f"{coins} <:TACoin:806882594519515146>", inline=True)
+       embed.add_field(name="Peníze", value=f"{coins} {Callouts().emote}", inline=True)
        embed.add_field(name="Věci 0/25 <:otrok:824609734778421258>", value= 'Kde nic tu nic...' , inline=False)
        embed.set_thumbnail(url= self.client.user.avatar_url)
        await ctx.send(embed=embed)
 
-    @commands.command(help='Kvíz o 100 TA Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá tlačítky s obsahem 1-4', usage='!kviz')
+    @commands.command(help=f'Kvíz o 100 {Callouts().emote} Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá tlačítky s obsahem 1-4', usage='!kviz')
     async def kviz(self, ctx, language=None):
         if language == None:
             language = 'en'
@@ -118,7 +118,7 @@ class Ekonomika(commands.Cog):
                 try:
                     msg = await self.client.wait_for('message', timeout=10.0, check=check)
                     if msg.content == str(number):
-                        await ctx.send('Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>')
+                        await ctx.send(f'Správná odpověď, dostal jsi 100 {Callouts().emote}')
                         result = stats['money'] + 100
                         inventory.update_one({'id': str(user.id), 'server': str(server.id)},
                                              {'$set': {'money': result}})
@@ -161,7 +161,7 @@ class Ekonomika(commands.Cog):
                 try:
                     instance = await self.client.wait_for('button_click', timeout=10.0, check=check2)
                     if instance.component.label == str(number):
-                        await instance.respond(type=4, content="Správná odpověď, dostal jsi 100 <:TACoin:806882594519515146>", ephemeral=False)
+                        await instance.respond(type=4, content=f"Správná odpověď, dostal jsi 100 {Callouts().emote}", ephemeral=False)
                         result = stats['money'] + 100
                         inventory.update_one({'id': str(user.id), 'server': str(server.id)},
                                              {'$set': {'money': result}})
@@ -180,29 +180,29 @@ class Ekonomika(commands.Cog):
         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         embed.set_thumbnail(
             url=self.client.user.avatar_url)
-        embed.add_field(name='[1] :knife: / 5000 <:TACoin:806882594519515146>',
+        embed.add_field(name=f'[1] :knife: / 5000 {Callouts().emote}',
                         value='Knife ti může i padnout. Zvyšuje šance na základní zvířata. S :knife: můžeš naviíc chytit :mammoth: :kangaroo: a :monkey:',
                         inline=False)
-        embed.add_field(name='[2] :archery: / 20 000 <:TACoin:806882594519515146>',
+        embed.add_field(name=f'[2] :archery: / 20 000 {Callouts().emote}',
                         value='Zvyšuje se šance na zvířata co můžeš chytit s :knife: Navíc můžeš chytit :bird:',
                         inline=False)
-        embed.add_field(name='[3] :spoon: / 50 000 <:TACoin:806882594519515146>',
+        embed.add_field(name=f'[3] :spoon: / 50 000 {Callouts().emote}',
                         value='Zvyšuje se šance na zvířata co můžeš chytit s :knife: a :archery: Navíc můžeš chytit :rabbit2: a :unicorn:',
                         inline=False)
-        embed.add_field(name='[4] <:otrok:824609734778421258> / 15 000 <:TACoin:806882594519515146>',
+        embed.add_field(name=f'[4] <:otrok:824609734778421258> / 15 000 {Callouts().emote}',
                         value='Kup si otroka a rozšiř si tak místo v inventáři o 50!', inline=False)
-        embed.add_field(name='[5]  ⭐SWAG/ 20 000 <:TACoin:806882594519515146>',
+        embed.add_field(name=f'[5]  ⭐SWAG/ 20 000 {Callouts().emote}',
                         value='Kup si roli ⭐SWAG, budeš výše v tabu a můžeš měnit přezdívky!!', inline=False)
         embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí !buy *čislo předmětu*')
         await ctx.send(embed=embed, components = [
             Select(
                 placeholder = "Vyber si co si chceš koupit.",
                 options = [
-                    SelectOption(label = "/ 5000 TA coinů", value = "1", emoji= '🔪'),
-                    SelectOption(label = "/ 20 000 TA coinů", value = "2", emoji= '🏹'),
-                    SelectOption(label="/ 50 000 TA coinů", value="3", emoji= '🥄'),
-                    SelectOption(label=" / 15 000 TA coinů", value="4", emoji=discord.PartialEmoji(name='otrok', id='824609734778421258')),
-                    SelectOption(label="SWAG/ 20 000 TA coinů", value="5", emoji= '⭐')
+                    SelectOption(label = f"/ 5000 {Callouts().name} coinů", value = "1", emoji= '🔪'),
+                    SelectOption(label = f"/ 20 000 {Callouts().name} coinů", value = "2", emoji= '🏹'),
+                    SelectOption(label=f"/ 50 000 {Callouts().name} coinů", value="3", emoji= '🥄'),
+                    SelectOption(label=f" / 15 000 {Callouts().name} coinů", value="4", emoji=discord.PartialEmoji(name='otrok', id='824609734778421258')),
+                    SelectOption(label=f"SWAG/ 20 000 {Callouts().name} coinů", value="5", emoji= '⭐')
                 ]
             )
         ])
@@ -225,7 +225,7 @@ class Ekonomika(commands.Cog):
 
 
 
-    @commands.command(help='Pošle danému člověku daný počet TA Coinů', usage='!send [peníze] [uživatel]')
+    @commands.command(help=f'Pošle danému člověku daný počet {Callouts().name} Coinů', usage='!send [peníze] [uživatel]')
     async def send(self, ctx, money=None, member: discord.Member = None):
         user = ctx.author
         server = ctx.guild
@@ -245,9 +245,9 @@ class Ekonomika(commands.Cog):
                 result2 = stats2['money'] + int(money)
                 inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {'money': result}})
                 inventory.update_one({'id': str(member.id), 'server': str(server.id)}, {'$set': {'money': result2}})
-                await ctx.send(f'Poslal jsi {member.mention} svých {money} <:TACoin:806882594519515146>')
+                await ctx.send(f'Poslal jsi {member.mention} svých {money} {Callouts().emote}')
             else:
-                await ctx.send('Nemáš dost <:TACoin:806882594519515146> na tuto platbu xd. Poor')
+                await ctx.send(f'Nemáš dost {Callouts().emote} na tuto platbu xd. Poor')
 
     @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře] (počet-nepovinný)')
     async def sell(self, ctx, item, count=None):
@@ -275,7 +275,7 @@ class Ekonomika(commands.Cog):
                 inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {'money': money_result}})
 
                 await ctx.send(
-                    f'Prodal jsi {count} :{item}: za {int(count) * price_list[pos_of_item]} <:TACoin:806882594519515146>')
+                    f'Prodal jsi {count} :{item}: za {int(count) * price_list[pos_of_item]} {Callouts().emote}')
             else:
                 await ctx.send(f'Nemáš dostatek :{item}: na prodej...')
 
@@ -321,7 +321,7 @@ class Ekonomika(commands.Cog):
                             kalda_money = random.choice(range(10, 100))
                             result = stats['money'] + kalda_money
                             await ctx.send(
-                                f'Našel jsi {catch[0]} . Okradl jsi ho a našel jsi {kalda_money} <:TACoin:806882594519515146> . <:TriHard:806263536921608212>')
+                                f'Našel jsi {catch[0]} . Okradl jsi ho a našel jsi {kalda_money} {Callouts().emote} . <:TriHard:806263536921608212>')
                             inventory.update_one({'id': str(user.id), 'server': str(server.id)},
                                                  {'$set': {'money': result}})
                         else:
@@ -344,7 +344,7 @@ class Ekonomika(commands.Cog):
             minutes = pending / 60
             await ctx.send(f'Znova můžeš použít příkaz za **{int(minutes)} minut** a **{int(pending % 60)} vteřin**')
 
-    @commands.command(help='Denní odměna TA Coinů, můžeš použít jednou za 24h.', usage='!daily')
+    @commands.command(help=f'Denní odměna {Callouts().name} Coinů, můžeš použít jednou za 24h.', usage='!daily')
     async def daily(self, ctx):
         user = ctx.author
         server = ctx.guild
@@ -358,10 +358,10 @@ class Ekonomika(commands.Cog):
 
         answer = await coin_add_24(user, server, 300)
         if answer == True:
-            await ctx.send('Vyzvednul sis denní odměnu 300 <:TACoin:806882594519515146>')
+            await ctx.send(f'Vyzvednul sis denní odměnu 300 {Callouts().emote}')
         elif answer == False:
             await ctx.send(
-                f'Dnes sis již vyzvedl <:TACoin:806882594519515146>. Znova si jej můžeš vyzvednout za `{int(pending_h)} hodin {int(pending_m_final)} minut {int(pending_s_final)} vteřin`')
+                f'Dnes sis již vyzvedl {Callouts().emote}. Znova si jej můžeš vyzvednout za `{int(pending_h)} hodin {int(pending_m_final)} minut {int(pending_s_final)} vteřin`')
 
     @commands.command(help='Zobrazí jaké zvíře můžeš za kolik prodat.', usage='!prices')
     async def prices(self, ctx):
@@ -371,10 +371,10 @@ class Ekonomika(commands.Cog):
         embed.set_thumbnail(
             url=self.client.user.avatar_url)
         embed.add_field(name="Věci:", value='\n'.join(
-            "{} / {} <:TACoin:806882594519515146>".format(x, y) for x, y in zip(sell_list, price_list)), inline=False)
+            "{} / {} {}".format(x, y, Callouts().emote) for x, y in zip(sell_list, price_list)), inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(help='Ukáže počet TA Coinů které máš', usage='!money (uživatel-nepovinný)')
+    @commands.command(help=f'Ukáže počet {Callouts().name} Coinů které máš', usage='!money (uživatel-nepovinný)')
     async def money(self, ctx, user: discord.Member = None, aliases='balance'):
 
         server = ctx.guild
@@ -385,7 +385,7 @@ class Ekonomika(commands.Cog):
         stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
 
         money = stats['money']
-        await ctx.send(f'Máš {money} <:TACoin:806882594519515146>')
+        await ctx.send(f'Máš {money} {Callouts().emote}')
 
 
 

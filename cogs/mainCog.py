@@ -5,6 +5,7 @@ from discord.utils import get
 import requests
 import os
 import random
+from callouts import Callouts
 translator = google_translator()
 class Funkce(commands.Cog):
     def __init__(self, client):
@@ -30,9 +31,9 @@ class Funkce(commands.Cog):
         await ctx.send(
             '<@621353544490024961> , <@551426822299189259>, <@621701863821148166>, <@558659043833675806> pojďte hrát!')
 
-    @commands.command(help='Ukáže TA Coin zblízka', usage='!emote')
+    @commands.command(help=f'Ukáže {Callouts().name} Coin zblízka', usage='!emote')
     async def emote(self, ctx):
-        await ctx.send('<:TACoin:806882594519515146>')
+        await ctx.send(f'{Callouts().emote}')
 
     @commands.command(help='Kdo vyrobil bota?',usage='!credit')
     async def credit(self, ctx):
@@ -58,7 +59,7 @@ class Funkce(commands.Cog):
                 help = self.client.get_command(command).help
                 usage = self.client.get_command(command).usage
                 embed = discord.Embed(title=f"Help !{command}", description=f"Tady je help pro command {command}:", color=0xff0000)
-                embed.set_author(name="TA Discord Bot")
+                embed.set_author(name=f"{Callouts().name} Discord Bot")
                 embed.set_thumbnail(
                     url=self.client.user.avatar_url)
                 embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
@@ -71,13 +72,13 @@ class Funkce(commands.Cog):
                     description=
                     "Pokud potřebuješ s čimkoli pomoct, tady jsou všechny příkazy:",
                     color=0xff0000)
-                embed.set_author(name="TA Discord Bot")
+                embed.set_author(name=f"{Callouts().name} Discord Bot")
                 embed.set_thumbnail(
                     url=
                     self.client.user.avatar_url
                 )
                 embed.add_field(name="Funkce :gear: ", value="`ping` `pong` `status` `mute` `unmute` `clear` `kick` `ban` `blacklist`", inline=False)
-                embed.add_field(name="Vlastní commandy <:TACoin:806882594519515146> ",
+                embed.add_field(name=f"Vlastní commandy {Callouts().emote} ",
                                 value="`yum` `emote` `kompet` `credit` `shrug` `translate`", inline=False)
                 embed.add_field(name="Random věci :slot_machine: ",
                                 value="`ucitel` `howgay` `simp` `rng` `pp` `meme` `student`",
@@ -88,7 +89,7 @@ class Funkce(commands.Cog):
                 embed.add_field(name="Kahoot <:kahoot:813837093494325278> ", value="`kahoot` `kahoot` ", inline=False)
                 embed.add_field(name="Rank systém :chart_with_upwards_trend: ", value="`rank` `leaderboard`", inline=False)
                 embed.add_field(name="Minecraft server :tent: ", value="`server` `server` ", inline=False)
-                embed.add_field(name="Ekonomika <:TACoin:806882594519515146> ",
+                embed.add_field(name=f"Ekonomika {Callouts().emote} ",
                                 value="`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `sell` `prices` ",
                                 inline=False)
                 embed.add_field(name="Hudba :notes: ", value="`join` `leave` `play` `skip` `pause` `resume`",
