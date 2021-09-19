@@ -1,4 +1,4 @@
 class Callouts():
     def __init__(self):
         self.name = 'KA'
-        self.emote = '<:TACoin:806882594519515146>'
+        self.emote = '<:KACoin:889154863097839626>'
