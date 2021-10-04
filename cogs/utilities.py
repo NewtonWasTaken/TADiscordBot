@@ -93,7 +93,7 @@ class Utilities(commands.Cog):
             r = requests.get('https://www.facebook.com/')
             print(r.status_code)
             if r.status_code == 200:
-                await channel.send('@everyone jede Facebook Pog')
+                await channel.send('@everyone jede Facebook Pog ')
 
         except:
             await channel.send(f'Facebook furt offline {datetime.datetime.now()}')
