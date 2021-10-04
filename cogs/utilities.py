@@ -85,7 +85,7 @@ class Utilities(commands.Cog):
             await role.edit(name=f"{data['perfs']['rapid']['rating']} elo v šachách = pjethed")
             storage.update_one({'id': '4'}, {'$set':{'elo': str(data['perfs']['rapid']['rating'])}})
 
-    @tasks.loop(seconds=5.0)
+    @tasks.loop(seconds=1800.0)
     async def facebook(self):
         await self.client.wait_until_ready()
         channel = self.client.get_channel(774181068622135296)
