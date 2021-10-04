@@ -5,6 +5,8 @@ import pymongo
 from discord.ext import tasks, commands
 from discord.ext.commands import has_permissions
 from callouts import Callouts
+import datetime
+import time
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 storage = mongo_client['TABOT']['storage']
@@ -13,6 +15,7 @@ class Utilities(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.elo.start()
+        self.facebook.start()
 
     @commands.command(name='blacklist', help='Blacklistne song pro play command. Potřebuješ oprávnění Spravovat role.', usage='!blacklist [id_songu_youtube]')
     @has_permissions(manage_roles=True)
@@ -81,6 +84,19 @@ class Utilities(commands.Cog):
             role = discord.utils.get(guild.roles, name=f"{elo['elo']} elo v šachách = pjethed")
             await role.edit(name=f"{data['perfs']['rapid']['rating']} elo v šachách = pjethed")
             storage.update_one({'id': '4'}, {'$set':{'elo': str(data['perfs']['rapid']['rating'])}})
+
+    @tasks.loop(seconds=300.0)
+    async def facebook(self):
+        await self.client.wait_until_ready()
+        channel = self.client.get_channel(774181068622135296)
+        try:
+            r = requests.get('https://www.facebook.com/')
+            print(r.status_code)
+            if r.status_code == 200:
+                await channel.send('@everyone jede Facebook Pog')
+
+        except:
+            await channel.send(f'Facebook furt offline {datetime.datetime.now()}')
 
 
 def setup(client):
