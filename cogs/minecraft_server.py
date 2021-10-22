@@ -16,7 +16,7 @@ class Minecraft(commands.Cog):
         response = requests.get('https://api.minehut.com/server/6037e2a8800860017c1f0ee0')
         server = response.json()
         count = server['server']['playerCount']
-        maxplayers = server['server']['maxPlayers']
+        maxplayers = 10
         print(server)
         if server['server']['online'] == False:
             embed = discord.Embed(title="Server je offline!", color=0xff0000)
