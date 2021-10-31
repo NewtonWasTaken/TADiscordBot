@@ -77,8 +77,8 @@ class Music(commands.Cog):
                     embed = discord.Embed(title="Hudba", color=0x1927e6)
                     embed.set_thumbnail(
                         url=self.client.user.avatar_url)
-                    embed.add_field(name="Přidáno do řady", value=f"[{song_queue[str(ctx.guild.id)][0]['title']}]({song_queue[str(ctx.guild.id)][0]['link']})", inline=False)
-                    embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][0]['user'].mention}", inline=False)
+                    embed.add_field(name="Přidáno do řady", value=f"[{song_queue[str(ctx.guild.id)][-1]['title']}]({song_queue[str(ctx.guild.id)][-1]['link']})", inline=False)
+                    embed.add_field(name=f"Song navrhl: ", value=f"{song_queue[str(ctx.guild.id)][-1]['user'].mention}", inline=False)
                     await ctx.send(embed=embed)
 
     @commands.command(help='Přeskočí song co právě hraje', usage='!skip')
