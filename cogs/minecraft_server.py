@@ -9,7 +9,7 @@ class Minecraft(commands.Cog):
 
     @commands.group(name='server', invoke_without_command=True, help='Zobrazí IP a verzi našeho serveru', usage='!server <status> \nstatus: nepovinný, ukáže jestli je server online')
     async def server(self, ctx):
-        await ctx.send('IP našeho serveru je: BigyKvarta.minehut.gg, Je na verzi 1.17.1')
+        await ctx.send('IP našeho serveru je: BigyKvarta.minehut.gg, Je na verzi 1.18')
 
     @server.command(name='status')
     async def status_subcommand(self, ctx):
