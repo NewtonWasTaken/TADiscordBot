@@ -88,7 +88,7 @@ class Utilities(commands.Cog):
     @tasks.loop(seconds=3600.0)
     async def skola(self):
         await self.client.wait_until_ready()
-        if datetime.datetime.today().hour == 16 and datetime.datetime.today().weekday() + 1 < 6:
+        if datetime.datetime.today().hour + 1 == 16 and datetime.datetime.today().weekday() + 1 < 6:
             day = predmety.find_one({'DEN': f'{datetime.datetime.today().weekday() + 1}'})
 
             for i in day:
