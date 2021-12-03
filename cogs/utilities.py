@@ -10,11 +10,12 @@ import time
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 storage = mongo_client['TABOT']['storage']
-
+predmety = mongo_client['TABOT']['predmety']
 class Utilities(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.elo.start()
+        self.skola.start()
 
     @commands.command(name='blacklist', help='Blacklistne song pro play command. Potřebuješ oprávnění Spravovat role.', usage='!blacklist [id_songu_youtube]')
     @has_permissions(manage_roles=True)
@@ -83,6 +84,19 @@ class Utilities(commands.Cog):
             role = discord.utils.get(guild.roles, name=f"{elo['elo']} elo v šachách = pjethed")
             await role.edit(name=f"{data['perfs']['rapid']['rating']} elo v šachách = pjethed")
             storage.update_one({'id': '4'}, {'$set':{'elo': str(data['perfs']['rapid']['rating'])}})
+
+    @tasks.loop(seconds=3600.0)
+    async def skola(self):
+        await self.client.wait_until_ready()
+        if datetime.datetime.today().hour == 16 and datetime.datetime.today().weekday() + 1 < 6:
+            day = predmety.find_one({'DEN': f'{datetime.datetime.today().weekday() + 1}'})
+
+            for i in day:
+                if i == '_id' or i == 'DEN':
+                    pass
+                else:
+                    channel = self.client.get_channel(int(day[i]))
+                    await channel.send(f'@everyone\n*Datum: <t:{int(time.time())}>*\nZápis z {i}:')
 
 
 

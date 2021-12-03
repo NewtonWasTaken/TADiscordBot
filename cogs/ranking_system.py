@@ -118,6 +118,16 @@ class Ranking(commands.Cog):
             lvl_end = stats['level'] + 1
             exp = stats['xp']
             finish = lvl_end ** (1 / (1 / 4))
+        if server.id == 916350309503225866:
+            channel = self.client.get_channel(916350309503225869)
+            lvl_end = stats['level'] + 1
+            exp = stats['xp']
+            finish = lvl_end ** (1 / (1 / 4))
+        if server.id == 802916230712786985:
+            channel = self.client.get_channel(916368341105532978)
+            lvl_end = stats['level'] + 1
+            exp = stats['xp']
+            finish = lvl_end ** (1 / (1 / 4))
 
         if exp >= finish:
             update_level = lvl_end
