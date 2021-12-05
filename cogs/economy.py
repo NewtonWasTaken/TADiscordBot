@@ -154,14 +154,12 @@ class Ekonomika(commands.Cog):
                         number = x
                         break
                     x = x + 1
-                print(number)
                 def check2(m):
                     return m.user == ctx.author
 
                 try:
                     instance = await self.client.wait_for('button_click', timeout=10.0, check=check2)
                     if instance.component.label == str(number):
-                        print(str(number))
                         await instance.respond(type=4, content=f"Správná odpověď, dostal jsi 100 {self.client.get_emoji(int(Callouts().id))}", ephemeral=False)
                         result = stats['money'] + 100
                         inventory.update_one({'id': str(user.id), 'server': str(server.id)},

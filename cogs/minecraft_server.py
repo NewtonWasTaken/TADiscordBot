@@ -17,7 +17,6 @@ class Minecraft(commands.Cog):
         server = response.json()
         count = server['server']['playerCount']
         maxplayers = 10
-        print(server)
         if server['server']['online'] == False:
             embed = discord.Embed(title="Server je offline!", color=0xff0000)
             embed.set_author(name="Minecraft Server Kvarta A")

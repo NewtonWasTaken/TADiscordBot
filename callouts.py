@@ -1,5 +1,5 @@
 class Callouts():
     def __init__(self):
         self.name = 'KA'
-        self.emote = '<:KACoin:889154863097839626>'
-        self.id = '889154863097839626'
+        self.emote = '<:KACoin:889155510027292712>'
+        self.id = '889155510027292712'
