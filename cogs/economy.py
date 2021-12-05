@@ -161,7 +161,8 @@ class Ekonomika(commands.Cog):
                 try:
                     instance = await self.client.wait_for('button_click', timeout=10.0, check=check2)
                     if instance.component.label == str(number):
-                        await instance.respond(type=4, content=f"Správná odpověď, dostal jsi 100 {Callouts().emote}", ephemeral=False)
+                        print(str(number))
+                        await instance.respond(type=4, content=f"Správná odpověď, dostal jsi 100 {self.client.get_emoji(int(Callouts().id))}", ephemeral=False)
                         result = stats['money'] + 100
                         inventory.update_one({'id': str(user.id), 'server': str(server.id)},
                                              {'$set': {'money': result}})
