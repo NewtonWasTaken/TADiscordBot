@@ -47,10 +47,8 @@ class Funkce(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(help='Přeloží zadaný text z EN do CZ', usage='!translate [text]')
-    async def translate(self, ctx, *, text):
-        trans_text = text
-        result = translator.translate(trans_text, lang_tgt='cs')
-        await ctx.send(result)
+    async def translate(self, ctx):
+        await ctx.send('Překladač je dočasně nedostupný...')
 
     @commands.command(help='Zobrazí help na všechny commandy', usage='!help (command-nepovinný)')
     async def help(self, ctx, command=None):
