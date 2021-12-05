@@ -49,19 +49,6 @@ async def on_command_error(ctx, error):
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
         await ctx.send(embed=embed)
-    if isinstance(error, commands.AttributeError):
-        command = ctx.command.qualified_name
-        help = client.get_command(command).help
-        usage = client.get_command(command).usage
-        embed = discord.Embed(title=f"Chyba", description=f"Tady je help pro command {command}:",
-                              color=0xff0000)
-        embed.set_author(name=f"{Callouts().name} Discord Bot")
-        embed.set_thumbnail(
-            url=client.user.avatar_url)
-        embed.add_field(name="Použití:", value=f"`{usage}`", inline=False)
-        embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
-        embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
-        await ctx.send(embed=embed)
     else:
 
         print(error)
@@ -83,6 +70,7 @@ client.load_extension('cogs.random')
 client.load_extension('cogs.music')
 client.load_extension('cogs.mainCog')
 client.load_extension('cogs.utilities')
+client.load_extension('cogs.osu')
 
 
 

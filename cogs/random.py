@@ -8,7 +8,6 @@ from callouts import Callouts
 password = os.getenv('PASSWORD')
 mongo_client = pymongo.MongoClient(f'mongodb+srv://newton:{password}@tabot.ardyf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 storage = mongo_client['TABOT']['storage']
-pp = ['8D', '8=D', '8==D', '8===D', '8====D', '8=====D', '8======D', '8=======D', '8========D']
 life = ['Žiju!', 'Nežiju!']
 distribution = [.9, .1]
 
@@ -72,12 +71,6 @@ class Random(commands.Cog):
         await ctx.send(
             f'{member.mention} simpíš{random.choice(ourclasssimp)} na {random.randrange(1, 100, 3)}%. <:SIMP:782941806244921354>')
         input.close()
-
-    @commands.command(name='pp', help='Ukáže jak máš dlouhý pp.', usage='!pp (uživatel-nepovinný)')
-    async def delka(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.message.author
-        await ctx.send(f'{member.mention} máš {random.choice(pp)}')
 
     @commands.command(help='Ukáže náhodného člověka z naší třídy.', usage='!rng')
     async def rng(self, ctx):
