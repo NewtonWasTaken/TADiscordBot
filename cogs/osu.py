@@ -65,11 +65,11 @@ class Osu(commands.Cog):
                                 inline=False)
             if graveyard[0]["beatmap"]["status"] == "graveyard":
                 embed.add_field(name="Nejhranější mapa",
-                                value=f'<:rip:917382794970279956> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]} \n :regional_indicator_x: Počet odehrání: {graveyard[0]["beatmapset"]["play_count"]}x ',
+                                value=f'<:rip:917382794970279956> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]}',
                                 inline=False)
             else:
                 embed.add_field(name="Nejhranější mapa",
-                                value=f'<:osu:917383973984940072> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]} \n :regional_indicator_x: Počet odehrání: {graveyard[0]["beatmapset"]["play_count"]}x ',
+                                value=f'<:osu:917383973984940072> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]}',
                                 inline=False)
             embed.add_field(name="Odehraných map:",
                             value=f'<:osu:917383973984940072> {data["beatmap_playcounts_count"]}',
@@ -84,6 +84,9 @@ class Osu(commands.Cog):
             minutes = (data["statistics"]["play_time"] / 60) - (hours * 60)
             embed.add_field(name="Odehráno hodin:",
                             value=f':alarm_clock: {hours} h {int(minutes)} min.',
+                            inline=False)
+            embed.add_field(name="Světové hodnocení: ",
+                            value=f':globe_with_meridians: {data["statistics"]["global_ranking"]}',
                             inline=False)
             embed.add_field(name="Odkaz:",
                             value=f'[{data["username"]}](https://osu.ppy.sh/users/{data["id"]})',
@@ -189,11 +192,11 @@ class Osu(commands.Cog):
                                 inline=False)
             if graveyard[0]["beatmap"]["status"] == "graveyard":
                 embed.add_field(name="Nejhranější mapa",
-                                value=f'<:rip:917382794970279956> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]} \n :regional_indicator_x: Počet odehrání: {graveyard[0]["beatmapset"]["play_count"]}x ',
+                                value=f'<:rip:917382794970279956> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]}',
                                 inline=False)
             else:
                 embed.add_field(name="Nejhranější mapa",
-                                value=f'<:osu:917383973984940072> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]} \n :regional_indicator_x: Počet odehrání: {graveyard[0]["beatmapset"]["play_count"]}x ',
+                                value=f'<:osu:917383973984940072> {graveyard[0]["beatmapset"]["artist"]} - {graveyard[0]["beatmapset"]["title"]}',
                                 inline=False)
             embed.add_field(name="Odehraných map:",
                             value=f'<:osu:917383973984940072> {data["beatmap_playcounts_count"]}',
@@ -208,6 +211,9 @@ class Osu(commands.Cog):
             minutes = (data["statistics"]["play_time"] / 60) - (hours * 60)
             embed.add_field(name="Odehráno hodin:",
                             value=f':alarm_clock: {hours} h {int(minutes)} min.',
+                            inline=False)
+            embed.add_field(name="Světové hodnocení: ",
+                            value=f':globe_with_meridians: {data["statistics"]["global_ranking"]}',
                             inline=False)
             embed.add_field(name="Odkaz:",
                             value=f'[{data["username"]}](https://osu.ppy.sh/users/{data["id"]})',
