@@ -86,7 +86,7 @@ class Osu(commands.Cog):
                             value=f':alarm_clock: {hours} h {int(minutes)} min.',
                             inline=False)
             embed.add_field(name="Světové hodnocení: ",
-                            value=f':globe_with_meridians: {data["statistics"]["global_ranking"]}',
+                            value=f':globe_with_meridians: {data["statistics"]["global_rank"]}',
                             inline=False)
             embed.add_field(name="Odkaz:",
                             value=f'[{data["username"]}](https://osu.ppy.sh/users/{data["id"]})',
@@ -213,7 +213,7 @@ class Osu(commands.Cog):
                             value=f':alarm_clock: {hours} h {int(minutes)} min.',
                             inline=False)
             embed.add_field(name="Světové hodnocení: ",
-                            value=f':globe_with_meridians: {data["statistics"]["global_ranking"]}',
+                            value=f':globe_with_meridians: {data["statistics"]["global_rank"]}',
                             inline=False)
             embed.add_field(name="Odkaz:",
                             value=f'[{data["username"]}](https://osu.ppy.sh/users/{data["id"]})',
