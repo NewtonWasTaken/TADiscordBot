@@ -79,7 +79,7 @@ class Funkce(commands.Cog):
                 embed.add_field(name=f"Vlastní commandy {Callouts().emote} ",
                                 value="`yum` `emote` `kompet` `credit` `shrug` `translate`", inline=False)
                 embed.add_field(name="Random věci :slot_machine: ",
-                                value="`ucitel` `howgay` `simp` `rng` `pp` `meme` `student`",
+                                value="`ucitel` `howgay` `simp` `rng` `meme` `student` `news`",
                                 inline=False)
                 embed.add_field(name="NSFW :underage: ", value="`boob` `butt` `nsfw`", inline=False)
                 embed.add_field(name="Flaška <:flaska:807228132326899732> ",
@@ -91,6 +91,8 @@ class Funkce(commands.Cog):
                                 value="`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `sell` `prices` ",
                                 inline=False)
                 embed.add_field(name="Hudba :notes: ", value="`join` `leave` `play` `skip` `pause` `resume`",
+                                inline=False)
+                embed.add_field(name="Osu! <:osu:917383973984940072> ", value="`osu` `pp`",
                                 inline=False)
                 embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
                 await ctx.send(embed=embed)

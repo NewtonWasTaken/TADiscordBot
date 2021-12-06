@@ -31,6 +31,7 @@ async def on_command_error(ctx, error):
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
         await ctx.send(embed=embed)
+        print(error)
     if isinstance(error, commands.MissingPermissions):
         await ctx.send('Nemáš oprávnění pro tenhle command.')
     if isinstance(error, commands.CommandNotFound):
@@ -49,8 +50,8 @@ async def on_command_error(ctx, error):
         embed.add_field(name="Co dělá?", value=f"`{help}`", inline=True)
         embed.set_footer(text="Pro help s jakýmkoli commandem napiš !help [command]")
         await ctx.send(embed=embed)
+        print(error)
     else:
-
         print(error)
 
 @client.command()
