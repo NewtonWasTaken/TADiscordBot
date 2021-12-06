@@ -86,7 +86,7 @@ class Funkce(commands.Cog):
                                 value="`flaska`", inline=False)
                 embed.add_field(name="Kahoot <:kahoot:813837093494325278> ", value="`kahoot` ", inline=False)
                 embed.add_field(name="Rank systém :chart_with_upwards_trend: ", value="`rank` `leaderboard`", inline=False)
-                embed.add_field(name="Minecraft server :tent: ", value="`server` `server` ", inline=False)
+                embed.add_field(name="Minecraft server :tent: ", value="`server` ", inline=False)
                 embed.add_field(name=f"Ekonomika {Callouts().emote} ",
                                 value="`daily` `money` `inventory` `hunt` `send` `shop` `kviz` `sell` `prices` ",
                                 inline=False)
