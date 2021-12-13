@@ -15,7 +15,6 @@ class Utilities(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.elo.start()
-        self.skola.start()
 
     @commands.command(name='blacklist', help='Blacklistne song pro play command. Potřebuješ oprávnění Spravovat role.', usage='!blacklist [id_songu_youtube]')
     @has_permissions(manage_roles=True)
