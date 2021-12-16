@@ -16,5 +16,5 @@ gunicorn
 gevent
 ffmpeg
 pynacl
-youtube_dl
+youtube_dl==2021.12.17
 discord-components
