@@ -25,7 +25,7 @@ class Music(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(help='Připojí bota k tobě na voice.', usage='!connect')
+    @commands.command(help='Připojí bota k tobě na voice.', usage='!connect', aliases=['join'])
     async def connect(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -42,7 +42,7 @@ class Music(commands.Cog):
                 return (True)
                 await ctx.send('Bot už je připojen jinde')
 
-    @commands.command(help='Odpojí bota z voice.', usage='!leave')
+    @commands.command(help='Odpojí bota z voice.', usage='!leave', aliases=['disconnect'])
     async def leave(self, ctx):
         channel = ctx.author.voice
         voice = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
