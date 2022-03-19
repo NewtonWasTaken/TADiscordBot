@@ -80,14 +80,15 @@ class Ranking(commands.Cog):
             list.append(i)
         list.sort(reverse=True, key=sort_func)
         for i in list:
+            if l == 21:
+                break
             id.append(i['id'])
             xp.append(i['xp'])
             rank.append(l)
             l+=1
         embed = discord.Embed(title='Leaderboard',description='Tady vidíš kolikáty jsi v počtu odeslaných zpráv, za každou zprávu je 20xp:', color=0x1926e1)
         embed.add_field(name='Tabulka' ,value="\n".join("{}. - <@{}> - {} XP".format(x, y, z) for x, y, z in zip(rank,id, xp) ), inline=False)
-        embed.set_thumbnail(url=
-                            self.client.user.avatar_url)
+        embed.set_thumbnail(url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
 
