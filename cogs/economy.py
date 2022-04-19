@@ -224,7 +224,7 @@ class Ekonomika(commands.Cog):
 
 
 
-    @commands.command(help=f'Pošle danému člověku daný počet {Callouts().name} Coinů', usage='!send [peníze] [uživatel]')
+    @commands.command(help=f'Pošle danému člověku daný počet {Callouts().name} Coinů', usage='!send [peníze] [uživatel]', aliases=['give'])
     async def send(self, ctx, money=None, member: discord.Member = None):
         user = ctx.author
         server = ctx.guild
@@ -248,7 +248,7 @@ class Ekonomika(commands.Cog):
             else:
                 await ctx.send(f'Nemáš dost {Callouts().emote} na tuto platbu xd. Poor')
 
-    @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře] (počet-nepovinný)', aliases=['give'])
+    @commands.command(help='Prodáš item. Jméno se uvádí podle jména emotu.', usage='!sell [zvíře] (počet-nepovinný)')
     async def sell(self, ctx, item, count=None):
         user = ctx.author
         server = ctx.guild
