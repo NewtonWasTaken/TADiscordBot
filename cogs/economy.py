@@ -235,6 +235,8 @@ class Ekonomika(commands.Cog):
             await ctx.send('Musíš napsat komu chceš peníze poslat!')
         elif money == None:
             await ctx.send('Musíš napsat kolik chceš dotyčnému poslat!')
+        elif member.id == ctx.author.id:
+            await ctx.send('Nemůžeš poslat peníze sám sobě!')
         elif int(money) <= 0:
             await ctx.send('Špatná hodnota')
         else:
