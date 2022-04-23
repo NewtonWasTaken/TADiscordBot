@@ -11,7 +11,7 @@ class Flaska(commands.Cog):
     def __init__(self, client):
         self.slient = client
 
-    @commands.group(name='flaska', invoke_without_command=True)
+    @commands.group(name='flaska', invoke_without_command=True, help='Připojí tě do hry flašky s ostatními členy Discordu.', usage='!flaska <list|start|end> \nlist: nepovinný, zobrazí list hráčů připojených ve flašce\nstart: nepovinný, vylosuje flašku z připojených lidí\nend: nepovinný, vymaže list připojených lidí a ukonči flašku')
     async def flaska(self, ctx):
         flaska1.append(f'<@{ctx.message.author.id}>')
         flaska2.append(f'{ctx.message.author.name}')
