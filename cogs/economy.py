@@ -345,6 +345,78 @@ class Ekonomika(commands.Cog):
             minutes = pending / 60
             await ctx.send(f'Znova můžeš použít příkaz za **{int(minutes)} minut** a **{int(pending % 60)} vteřin**')
 
+    @commands.command()
+    async def steal(self, ctx, member: discord.Member):
+        embed = discord.Embed(title=f'Kapsa <:kapsa:967500498397724742>', description=f'Kolik kapes chceš u {member.mention} prohledat?', color=0x0b49da)
+        embed.set_author(name=member, icon_url=member.avatar_url)
+        embed.set_thumbnail(
+            url=self.client.user.avatar_url)
+        embed.set_footer(text='Vyber si počet kapes dole:')
+        await ctx.send(embed=embed, components=[
+            Select(
+                placeholder="Kolik kapes chceš prohledat?",
+                options=[
+                    SelectOption(label="Jednu", value="1"),
+                    SelectOption(label=f"Dvě", value="2"),
+                    SelectOption(label=f"Tři", value="3"),
+                    SelectOption(label=f"Čtyři", value="4"),
+                    SelectOption(label=f"Pět", value="5")
+                ]
+            )
+        ])
+
+        def check(m):
+            return m.user == ctx.author
+        instance = await self.client.wait_for('select_option', check=check)
+        vyber = list(range(int(instance.values[0])-1))
+        kapsy = [-1, 0, 1, 2, 3]
+
+
+        if len(vyber) == 0:
+            await instance.respond(type=4, content=f"Úspěch :white_check_mark:", ephemeral=False)
+            time = random.randrange(3, 10)
+            embed = discord.Embed(title=f'Kapsa <:kapsa:967500498397724742>',
+                                  description=f'Vyber kapsu {member.mention}, kde si myslíš, že něco je. Rychle máš {time} vteřin!!',
+                                  color=0x0b49da)
+            embed.set_author(name=member, icon_url=member.avatar_url)
+            embed.set_thumbnail(
+                url=self.client.user.avatar_url)
+            embed.set_footer(text='Která kapsa je ta správná?')
+            await ctx.send(embed=embed, components = [[Button(emoji=discord.PartialEmoji(name='pocket', id='967500498397724742'), custom_id = '1', style= 1)]])
+
+            try:
+                instance = await self.client.wait_for('button_click', timeout=float(time), check=check)
+
+            except asyncio.TimeoutError:
+                await ctx.send(f'{member.name} si tě všiml!')
+
+
+
+        else:
+            choice = [3]
+            if choice[0] == vyber[-1]:
+                await instance.respond(type=4, content=f"Úspěch :white_check_mark:", ephemeral=False)
+                time = random.randrange(3, 10)
+                embed = discord.Embed(title=f'Kapsa <:kapsa:967500498397724742>',
+                                      description=f'Vyber kapsu {member.mention}, kde si myslíš, že něco je. Rychle máš {time} vteřin!!',
+                                      color=0x0b49da)
+                embed.set_author(name=member, icon_url=member.avatar_url)
+                embed.set_thumbnail(
+                    url=self.client.user.avatar_url)
+                embed.set_footer(text='Která kapsa je ta správná?')
+                print(create_button(vyber[-1]))
+                await ctx.send(embed=embed, components=create_button(vyber[-1]))
+
+                try:
+                    instance = await self.client.wait_for('button_click', timeout=float(time), check=check)
+
+                except asyncio.TimeoutError:
+                    await ctx.send(f'{member.name} si tě všiml!')
+            else:
+                await instance.send('Fail kkt')
+
+
+
     @commands.command(help=f'Denní odměna {Callouts().name} Coinů, můžeš použít jednou za 24h.', usage='!daily')
     async def daily(self, ctx):
         user = ctx.author
@@ -441,6 +513,20 @@ async def coin_add_24(user, server, money):
     return(True)
   else:
     return(False)
+
+def create_button(pocet):
+    list = []
+    x = 1
+    pocet = pocet + 2
+    for i in range(pocet):
+        list.append(Button(emoji=discord.PartialEmoji(name='pocket', id='967500498397724742'), custom_id=i + 1, style=1))
+        x += 1
+    print(list)
+    return([list])
+
+
+
+
 async def buy(ctx, number_buy, instance):
         user = ctx.author
         server = ctx.guild
