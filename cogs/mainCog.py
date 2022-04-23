@@ -99,7 +99,7 @@ class Funkce(commands.Cog):
             elif command not in command_names_list:
                 await ctx.send('Tenhle command neexistuje')
 
-    @commands.command()
+    @commands.command(help='Ukáže náhodnou čerstvou zprávu ze světa.', usage='!news')
     async def news(self, ctx):
         f = requests.get('https://newsapi.org/v2/top-headlines?country=cz&apiKey={}'.format(os.getenv('NEWS_TOKEN')))
         news = f.json()

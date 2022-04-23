@@ -192,7 +192,7 @@ class Ekonomika(commands.Cog):
                         value='Kup si otroka a rozšiř si tak místo v inventáři o 50!', inline=False)
         embed.add_field(name=f'[5]  ⭐SWAG/ 20 000 {Callouts().emote}',
                         value='Kup si roli ⭐SWAG, budeš výše v tabu a můžeš měnit přezdívky!!', inline=False)
-        embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí !buy *čislo předmětu*')
+        embed.set_footer(text='Jakýkoli předmět si můžeš koupit pomocí kolonky dole.')
         await ctx.send(embed=embed, components = [
             Select(
                 placeholder = "Vyber si co si chceš koupit.",
