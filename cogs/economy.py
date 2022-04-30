@@ -259,6 +259,8 @@ class Ekonomika(commands.Cog):
         things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
         if count == None:
             count = 1
+        if count <= 0:
+            await ctx.send('Špatné číslo')
         if f':{item}:' not in sell_list:
             await ctx.send('Toto zvíře neznám...')
         elif f':{item}:' in sell_list:
