@@ -263,7 +263,7 @@ class Ekonomika(commands.Cog):
             await ctx.send('Špatné číslo')
         if f':{item}:' not in sell_list:
             await ctx.send('Toto zvíře neznám...')
-        elif f':{item}:' in sell_list:
+        elif f':{item}:' in sell_list and int(count) > 0:
             check_item = things[f':{item}:'] - int(count)
             x = 0
             for i in sell_list:
