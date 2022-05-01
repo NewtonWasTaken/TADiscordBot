@@ -66,9 +66,8 @@ class Ekonomika(commands.Cog):
        await ctx.send(embed=embed)
 
     @commands.command(help=f'Kvíz o 100 {Callouts().emote} Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá tlačítky s obsahem 1-4', usage='!kviz')
-    async def kviz(self, ctx, language=None):
-        if language == None:
-            language = 'en'
+    async def kviz(self, ctx):
+        language = 'en'
         user = ctx.author
         server = ctx.guild
         await coin_update(user, server)
