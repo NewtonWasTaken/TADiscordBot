@@ -490,10 +490,17 @@ async def capacity_check(user, server):
 
 async def coin_add(user, server, time_clock, time_wait):
     stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+    things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
+    number_of_things = 0
+    for i in sell_list:
+        if i in things:
+            number_of_things += things[i]
     if stats['server'] == '806808047509831700':
         return(True)
     else:
-        if time.time() - stats[time_clock] >= time_wait:
+        if stats['capacity'] <= number_of_things:
+            return(True)
+        elif time.time() - stats[time_clock] >= time_wait:
             inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {time_clock: time.time()}})
             return (True)
         elif time.time() - stats[time_clock] < time_wait:
