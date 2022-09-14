@@ -73,7 +73,7 @@ client.load_extension('cogs.mainCog')
 client.load_extension('cogs.utilities')
 client.load_extension('cogs.osu')
 
-#test
+
 
 
 
