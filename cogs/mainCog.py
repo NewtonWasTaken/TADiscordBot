@@ -81,7 +81,6 @@ class Funkce(commands.Cog):
                 embed.add_field(name="Random věci :slot_machine: ",
                                 value="`ucitel` `howgay` `simp` `rng` `meme` `student` `news`",
                                 inline=False)
-                embed.add_field(name="NSFW :underage: ", value="`boob` `butt` `nsfw`", inline=False)
                 embed.add_field(name="Flaška <:flaska:807228132326899732> ",
                                 value="`flaska`", inline=False)
                 embed.add_field(name="Kahoot <:kahoot:813837093494325278> ", value="`kahoot` ", inline=False)
