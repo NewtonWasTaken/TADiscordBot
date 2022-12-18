@@ -66,9 +66,8 @@ class Ekonomika(commands.Cog):
        await ctx.send(embed=embed)
 
     @commands.command(help=f'Kvíz o 100 {Callouts().emote} Coinů. Jendou za 5 minut. Po zobrazení kvízu se odpovídá tlačítky s obsahem 1-4', usage='!kviz')
-    async def kviz(self, ctx, language=None):
-        if language == None:
-            language = 'en'
+    async def kviz(self, ctx):
+        language = 'en'
         user = ctx.author
         server = ctx.guild
         await coin_update(user, server)
@@ -263,7 +262,7 @@ class Ekonomika(commands.Cog):
             await ctx.send('Špatné číslo')
         if f':{item}:' not in sell_list:
             await ctx.send('Toto zvíře neznám...')
-        elif f':{item}:' in sell_list:
+        elif f':{item}:' in sell_list and int(count) > 0:
             check_item = things[f':{item}:'] - int(count)
             x = 0
             for i in sell_list:
@@ -491,10 +490,17 @@ async def capacity_check(user, server):
 
 async def coin_add(user, server, time_clock, time_wait):
     stats = inventory.find_one({'id': str(user.id), 'server': str(server.id)})
+    things = animals.find_one({'id': str(user.id), 'server': str(server.id)})
+    number_of_things = 0
+    for i in sell_list:
+        if i in things:
+            number_of_things += things[i]
     if stats['server'] == '806808047509831700':
         return(True)
     else:
-        if time.time() - stats[time_clock] >= time_wait:
+        if stats['capacity'] <= number_of_things:
+            return(True)
+        elif time.time() - stats[time_clock] >= time_wait:
             inventory.update_one({'id': str(user.id), 'server': str(server.id)}, {'$set': {time_clock: time.time()}})
             return (True)
         elif time.time() - stats[time_clock] < time_wait:
