@@ -61,6 +61,7 @@ async def button(ctx):
     await message.send(content= "Button clicked!")
 
 
+#Loading extensions
 client.load_extension('cogs.kahoot')
 client.load_extension('cogs.minecraft_server')
 client.load_extension('cogs.economy')

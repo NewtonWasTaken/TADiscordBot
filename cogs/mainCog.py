@@ -18,7 +18,7 @@ class Funkce(commands.Cog):
     async def ping(self, ctx):
         await ctx.send('Pong!')
 
-    @commands.command(help='to je opravdu yum', usage='!yum')
+    @commands.command(help='to je opravdu yim yum', usage='!yum')
     async def yum(self, ctx):
         await ctx.send('yim yum')
 
